@@ -10,6 +10,8 @@
 
 .idea/
 .bsp/
+.gradle/
+build/
 target/
 logs/
 
