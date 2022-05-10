@@ -3,7 +3,7 @@ package models
 import "github.com/shopspring/decimal"
 
 type Payment struct {
-	ID            uint
+	ID            uint            `json:"id"`
 	Total         decimal.Decimal `json:"total" validate:"required"`
 	TransactionID uint            `json:"transactionid" validate:"required"`
 }

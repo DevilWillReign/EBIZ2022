@@ -3,7 +3,7 @@ package models
 import "apprit/store/database/dtos"
 
 type Auth struct {
-	ID       uint
+	ID       uint          `json:"id"`
 	Authtype dtos.AuthType `json:"authtype" validate:"required"`
 	UserID   uint          `json:"userid" validate:"required"`
 }

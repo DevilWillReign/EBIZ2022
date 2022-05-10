@@ -1,8 +1,8 @@
 package models
 
 type User struct {
-	ID       uint
-	Username string
-	Email    string
-	Password string
+	ID       uint   `json:"id"`
+	Username string `json:"username" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }

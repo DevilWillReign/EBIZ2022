@@ -3,7 +3,7 @@ package models
 import "github.com/shopspring/decimal"
 
 type Product struct {
-	ID         uint
+	ID         uint            `json:"id"`
 	Name       string          `json:"name" validate:"required"`
 	Code       string          `json:"code" validate:"required"`
 	Price      decimal.Decimal `json:"price" validate:"required"`

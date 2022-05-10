@@ -1,7 +1,7 @@
 package models
 
 type Category struct {
-	ID      uint
+	ID      uint   `json:"id"`
 	Name    string `json:"name" validate:"required"`
 	Product []Product
 }

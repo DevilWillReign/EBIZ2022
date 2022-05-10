@@ -37,5 +37,5 @@ func main() {
 	controllers.GetQuantifiedProductGroup(e)
 	controllers.GetTransactionGroup(e)
 	controllers.GetUserGroup(e)
-	e.Logger.Fatal(e.Start(utils.GetEnv("PORT", ":9000")))
+	e.Logger.Fatal(e.Start(":" + utils.GetEnv("PORT", "9000")))
 }
