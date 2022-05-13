@@ -1,7 +1,11 @@
 import { useState } from "react"
 
 const Basket = () => {
-    var [bascket, setBasket] = useState([])
+    var [bascket, setBasket] = useState(sessionStorage.getItem("basket") == null ? [] : JSON.parse(sessionStorage.getItem("basket")))
+
+    const buyForProducts = (event) => {
+
+    }
 
     return (
         <div className="App">
@@ -12,6 +16,7 @@ const Basket = () => {
                     })
                 }
             </table>
+            <button onClick={buyForProducts}>Pay</button>
         </div>
     )
 }

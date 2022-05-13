@@ -4,11 +4,25 @@ go 1.18
 
 require (
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/gorilla/sessions v1.2.1
+	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/shopspring/decimal v1.3.1
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/gorm v1.23.5
+)
+
+require (
+	cloud.google.com/go v0.65.0 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
+	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
+	google.golang.org/appengine v1.6.6 // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
 )
 
 require (

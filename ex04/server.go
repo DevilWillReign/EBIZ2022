@@ -1,15 +1,18 @@
 package main
 
 import (
-	"apprit/store/controllers"
-	"apprit/store/database"
-	"apprit/store/utils"
+	"apprit/store/api/v1/controllers"
+	"apprit/store/api/v1/database"
+	"apprit/store/api/v1/utils"
 	"log"
 	"net/http"
 
 	"github.com/go-playground/validator"
+	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -17,25 +20,40 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	/**
+	DB initialization
+	*/
 	db := database.CreateDatabase()
 	database.InitializeDatabaseData(db)
+	/**
+	Echo initialization
+	*/
 	e := echo.New()
+	// CORS
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"localhost"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowCredentials: true,
+	}))
+	// Session
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(utils.GetEnv("SESSION_SECRET", "secret")))))
+	// Adding validator
 	e.Validator = &utils.CustomValidator{Validator: validator.New()}
+	// Adding db to echo context
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Set("db", db)
 			return next(c)
 		}
 	})
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-	controllers.GetCategoryGroup(e)
-	controllers.GetAuthGroup(e)
-	controllers.GetPaymentGroup(e)
-	controllers.GetProductGroup(e)
-	controllers.GetQuantifiedProductGroup(e)
-	controllers.GetTransactionGroup(e)
-	controllers.GetUserGroup(e)
-	e.Logger.Fatal(e.Start(":" + utils.GetEnv("PORT", "9000")))
+	// Adding api controllers
+	api := e.Group("/api/v1")
+	controllers.GetCategoryGroup(api)
+	controllers.GetAuthGroup(api)
+	controllers.GetPaymentGroup(api)
+	controllers.GetProductGroup(api)
+	controllers.GetQuantifiedProductGroup(api)
+	controllers.GetTransactionGroup(api)
+	controllers.GetUserGroup(api)
+	e.Logger.Fatal(e.Start(utils.GetEnv("HOST", "") + ":" + utils.GetEnv("PORT", "9000")))
 }

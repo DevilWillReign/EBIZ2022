@@ -1,42 +1,28 @@
-import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter, Route, Switch } from "react-router-dom"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Basket from './components/Basket';
 import Products from './components/Products';
+import Footer from './components/Footer';
+import Header from './components/Header';
+import Home from './components/Home';
+import Login from './components/Login';
+import Register from './components/Register';
+import Payments from './components/Payments';
 
 function App() {
   return (
-      <BrowserRouter>
-        <Switch>
-          <Route path='/basket'>
-            <Basket />
-          </Route>
-          <Route path='/payment'>
-            <Payments />
-          </Route>
-          <Route path='/products'>
-            <Products />
-          </Route>
-          <Route path='/'>
-            <div className="App">
-              <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                  Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                  className="App-link"
-                  href="https://reactjs.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Learn React
-                </a>
-              </header>
-            </div>
-          </Route>
-        </Switch>
-      </BrowserRouter>
+    <>
+      <Header />
+      <Routes>
+            <Route path='/basket' element={<Basket />} />
+            <Route path='/payment' element={<Payments />} />
+            <Route path='/products' element={<Products />} />
+            <Route path='/' element={<Home />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+      </Routes>
+      <Footer />
+    </>
   );
 }
 
