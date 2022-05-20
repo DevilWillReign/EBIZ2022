@@ -40,13 +40,12 @@ func getSession(c echo.Context) *sessions.Session {
 }
 
 func authWithOAuth(c echo.Context) error {
-	oauthConfig, _ := auth.GetAuthConfig(c.Param("provider"))
+	oauthConfig := auth.GetAuthConfig(c.Param("provider"))
 	if oauthConfig == nil {
 		return echo.NewHTTPError(http.StatusBadRequest, c.Param("provider"))
 	}
 	oauthState := generateStateOauthCookie(c)
 	sess := getSession(c)
-	sess.Values["error_redirect"] = c.QueryParam("error_redirect_url")
 	sess.Values["redirect"] = c.QueryParam("redirect_url")
 	sess.Save(c.Request(), c.Response())
 	oauthConfigUrl := oauthConfig.AuthCodeURL(oauthState, oauth2.AccessTypeOffline)
@@ -54,7 +53,7 @@ func authWithOAuth(c echo.Context) error {
 }
 
 func authWithOAuthCallback(c echo.Context) error {
-	oauthConfig, oauthApiUrl := auth.GetAuthConfig(c.Param("provider"))
+	oauthConfig := auth.GetAuthConfig(c.Param("provider"))
 	if oauthConfig == nil {
 		return echo.NewHTTPError(http.StatusBadRequest, c.Param("provider"))
 	}
@@ -62,32 +61,23 @@ func authWithOAuthCallback(c echo.Context) error {
 	oauthState, _ := c.Cookie("oauthstate")
 	sess := getSession(c)
 
-	error_redirect := sess.Values["error_redirect"]
-	if error_redirect == nil {
-		error_redirect = "/"
+	redirect := sess.Values["redirect"]
+	if redirect == nil {
+		return echo.NewHTTPError(http.StatusBadRequest)
 	}
 
 	if c.FormValue("state") != oauthState.Value {
 		sess.Values["redirect"] = nil
-		sess.Values["error_redirect"] = nil
 		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusUnauthorized, error_redirect.(string))
+		return c.Redirect(http.StatusUnauthorized, redirect.(string))
 	}
-
-	data, err := getUserDataFromGoogle(c.FormValue("code"), oauthConfig, oauthApiUrl)
+	data, err := getUserDataFromGoogle(c.FormValue("code"), oauthConfig, c.Param("provider"))
 	if err != nil {
 		sess.Values["redirect"] = nil
-		sess.Values["error_redirect"] = nil
 		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusUnauthorized, error_redirect.(string))
-	}
-
-	redirect := sess.Values["redirect"]
-	if redirect == nil {
-		redirect = "/"
+		return c.Redirect(http.StatusUnauthorized, redirect.(string))
 	}
 	sess.Values["redirect"] = nil
-	sess.Values["error_redirect"] = nil
 	sess.Values["userinfo"] = data
 	sess.Save(c.Request(), c.Response())
 	return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
@@ -126,12 +116,14 @@ func generateStateOauthCookie(c echo.Context) string {
 // 	log.Println(details.Error, details.ErrorDescription)
 // }
 
-func getUserDataFromGoogle(code string, oauthConfig *oauth2.Config, oauthApiUrl string) ([]byte, error) {
+func getUserDataFromGoogle(code string, oauthConfig *oauth2.Config, provider string) ([]byte, error) {
 	token, err := oauthConfig.Exchange(context.Background(), code)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	response, err := http.Get(oauthApiUrl + token.AccessToken)
+	req := auth.GetUserDataClient(provider, token)
+	httpClinet := &http.Client{}
+	response, err := httpClinet.Do(req)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

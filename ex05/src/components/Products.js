@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react"
 import API from "../util/api"
+import { myRange } from "../util/util"
 
 const Products = () => {
     var [products, setProducts] = useState([])
 
     useEffect(() => {
-        if (!products) {
-            API.get("/products").then((response) => {
-                const products = JSON.parse(response.data)
+        console.log(API.defaults)
+        API.get("/products").then((response) => {
+            if (response.status === 200) {
+                const products = response.data
                 setProducts(products)
-            })
-        }
+            }
+        })
     }, [])
 
     const addProductToBasket = (event, product) => {
@@ -24,17 +26,30 @@ const Products = () => {
     return (
         <div className="App">
             <table>
+                <tbody>
                 {
                     products.map((element, i) => {
-                        return <tr>
-                            <td>element.id</td>
-                            <td>element.name</td>
-                            <td>element.code</td>
-                            <td>element.price</td>
-                            <td><button onClick={(event) => addProductToBasket(event, element)}></button></td>
-                        </tr>
+                        var quantity = []
+                        for (const k of myRange(10, 1)) {
+                            quantity.push(<option key={k} value={k}>{k}</option>)
+                        }
+                        return (
+                            <tr key={element.id}>
+                                <td>{element.id}</td>
+                                <td>{element.name}</td>
+                                <td>{element.code}</td>
+                                <td>{element.price}</td>
+                                <td>
+                                    <select id={"quantity" + element.id}>
+                                        {quantity}
+                                    </select>
+                                </td>
+                                <td><button onClick={(event) => addProductToBasket(event, element)}>Add product to basket</button></td>
+                            </tr>
+                        )
                     })
                 }
+                </tbody>
             </table>
         </div>
     )

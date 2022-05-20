@@ -31,7 +31,7 @@ func main() {
 	e := echo.New()
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"localhost"},
+		AllowOrigins:     []string{"http://localhost:9001"},
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowCredentials: true,
 	}))
