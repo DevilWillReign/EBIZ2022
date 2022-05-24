@@ -1,0 +1,25 @@
+{
+    "auth": {
+        "username": "<username>",
+        "access_key": "<access-key>"
+    },
+    "browsers": [
+        {
+            "browser": "chrome",
+            "os": "Windows 10",
+            "versions": [
+                "78",
+                "77"
+            ]
+        }
+    ],
+    "run_settings": {
+        "cypress_proj_dir": "./cypress.json",
+        "project": "Apprit store",
+        "customBuildName": "Apprit store multi broser test"
+    },
+    "connection_settings": {
+        "local": false,
+        "localIdentifier": null
+    }
+}
