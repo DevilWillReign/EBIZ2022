@@ -9,6 +9,7 @@ import Profile from "../components/profile/Profile"
 import MainLayout from "../components/MainLayout"
 import Product from "../components/products/Product"
 import Transactions from "../components/profile/Transactions"
+import About from "../components/common/About"
 
 const routes = [
     {
@@ -70,8 +71,17 @@ const routes = [
                 element: <Payments />
             }
         ]
+    },
+    {
+        path: "/about",
+        element: <MainLayout />,
+        children: [
+            {
+                index: true,
+                element: <About />
+            }
+        ]
     }
-
 ]
 
 const Router = () => {

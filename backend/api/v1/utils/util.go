@@ -2,6 +2,7 @@ package utils
 
 import (
 	"apprit/store/api/v1/models"
+	"math/rand"
 	"net/http"
 	"os"
 
@@ -53,4 +54,14 @@ func CheckAutorization(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		return next(c)
 	}
+}
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func RandStringBytes(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }

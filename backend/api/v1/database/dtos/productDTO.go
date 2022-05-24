@@ -10,5 +10,7 @@ type ProductDTO struct {
 	Name          string          `gorm:"not null"`
 	Code          string          `gorm:"unique;not null"`
 	Price         decimal.Decimal `gorm:"not null"`
-	CategoryDTOID uint            `gorm:"not null"`
+	Availability  uint            `gorm:"not null"`
+	Description   string
+	CategoryDTOID uint `gorm:"not null"`
 }

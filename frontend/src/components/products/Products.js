@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react"
+import { NavLink } from 'react-router-dom'
 import API from "../../util/api"
-import myRange from "../../util/util"
 
 const Products = () => {
-    var [products, setProducts] = useState([])
+    const [products, setProducts] = useState([])
 
     useEffect(() => {
-        console.log(API.defaults)
         API.get("/products").then((response) => {
             if (response.status === 200) {
                 const products = response.data
@@ -17,42 +16,18 @@ const Products = () => {
         })
     }, [])
 
-    const addProductToBasket = (event, product) => {
-        let productWithQuantity = product
-        productWithQuantity.quantity = Math.random() * 100 + 1
-        let basket = sessionStorage.getItem("cart") == null ? JSON.parse(sessionStorage.getItem("cart")) : []
-        basket.push(productWithQuantity)
-        sessionStorage.setItem("cart", JSON.stringify(basket))
-    }
-
     return (
-        <div className="App">
-            <table>
-                <tbody>
-                {
-                    products.map((element, i) => {
-                        var quantity = []
-                        for (const k of myRange(10, 1)) {
-                            quantity.push(<option key={k} value={k}>{k}</option>)
-                        }
-                        return (
-                            <tr key={element.id}>
-                                <td>{element.name}</td>
-                                <td>{element.code}</td>
-                                <td>{element.price}</td>
-                                <td>
-                                    <select id={"quantity" + element.id}>
-                                        {quantity}
-                                    </select>
-                                </td>
-                                <td><button onClick={(event) => addProductToBasket(event, element)}>Add product to basket</button></td>
-                            </tr>
-                        )
-                    })
-                }
-                </tbody>
-            </table>
-        </div>
+        <ul id="product-list" className="list-group">
+            {
+                products.map(element => {
+                    return (
+                        <li className="list-group-item" key={element.id}>
+                            <NavLink to={element.id}>{element.code} {element.name}</NavLink>
+                        </li>
+                    )
+                })
+            }
+        </ul>
     )
 }
 

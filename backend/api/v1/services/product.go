@@ -55,9 +55,24 @@ func ReplaceProduct(db *gorm.DB, id uint64, product models.Product) error {
 }
 
 func copyProductProperties(productDTO dtos.ProductDTO) models.Product {
-	return models.Product{ID: productDTO.ID, Name: productDTO.Name, Code: productDTO.Code, Price: productDTO.Price, CategoryID: productDTO.CategoryDTOID}
+	return models.Product{
+		ID:           productDTO.ID,
+		Name:         productDTO.Name,
+		Code:         productDTO.Code,
+		Price:        productDTO.Price,
+		Availability: productDTO.Availability,
+		Description:  productDTO.Description,
+		CategoryID:   productDTO.CategoryDTOID,
+	}
 }
 
 func copyProductDTOProperties(product models.Product) dtos.ProductDTO {
-	return dtos.ProductDTO{Name: product.Name, Code: product.Code, Price: product.Price, CategoryDTOID: product.CategoryID}
+	return dtos.ProductDTO{
+		Name:          product.Name,
+		Code:          product.Code,
+		Price:         product.Price,
+		Availability:  product.Availability,
+		Description:   product.Description,
+		CategoryDTOID: product.CategoryID,
+	}
 }

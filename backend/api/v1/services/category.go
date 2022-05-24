@@ -55,9 +55,16 @@ func ReplaceCategory(db *gorm.DB, id uint64, category models.Category) error {
 }
 
 func copyCategoryProperties(categoryDTO dtos.CategoryDTO) models.Category {
-	return models.Category{ID: categoryDTO.ID, Name: categoryDTO.Name}
+	return models.Category{
+		ID:          categoryDTO.ID,
+		Name:        categoryDTO.Name,
+		Description: categoryDTO.Description,
+	}
 }
 
 func copyCategoryDTOProperties(category models.Category) dtos.CategoryDTO {
-	return dtos.CategoryDTO{Name: category.Name}
+	return dtos.CategoryDTO{
+		Name:        category.Name,
+		Description: category.Description,
+	}
 }

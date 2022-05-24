@@ -8,7 +8,7 @@ const MainLayout = () => {
     return (
         <>
             <Header />
-            <div className="container-fluid">
+            <div id="container" className="container-fluid">
                 <Outlet />
             </div>
             <Footer />

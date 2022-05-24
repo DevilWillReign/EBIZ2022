@@ -43,7 +43,7 @@ func CreateDatabase() *gorm.DB {
 }
 
 func InitializeDatabaseData(db *gorm.DB) {
-	productPrice, _ := decimal.NewFromString("1.05")
+	productPrice, _ := decimal.NewFromString("1000000.05")
 	for i := 1; i <= 5; i++ {
 		num := fmt.Sprint(i)
 		addCategoryIfNotExists(db, "Category"+num)
@@ -66,7 +66,10 @@ func addCategoryIfNotExists(db *gorm.DB, name string) {
 	c := new(dtos.CategoryDTO)
 	err := db.Where("name = ?", name).Take(&c)
 	if err.RowsAffected == 0 {
-		db.Create(&dtos.CategoryDTO{Name: name})
+		db.Create(&dtos.CategoryDTO{
+			Name:        name,
+			Description: utils.RandStringBytes(20),
+		})
 	}
 }
 
@@ -74,7 +77,14 @@ func addProductIfNotExists(db *gorm.DB, code string, name string, price decimal.
 	c := new(dtos.ProductDTO)
 	err := db.Where("code = ?", code).Take(&c)
 	if err.RowsAffected == 0 {
-		db.Create(&dtos.ProductDTO{Name: name, Code: code, Price: price, CategoryDTOID: 1})
+		db.Create(&dtos.ProductDTO{
+			Name:          name,
+			Code:          code,
+			Price:         price,
+			Availability:  uint(mathrand.Int63n(64)),
+			Description:   utils.RandStringBytes(20),
+			CategoryDTOID: 1,
+		})
 	}
 }
 
