@@ -1,8 +1,12 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
+import { useNavigate } from "react-router-dom"
 import * as Yup from "yup"
+import API from "../../util/api"
 import './Login.css'
 
 const Register = () => {
+    const navigate = useNavigate()
+
     return (
         <div className="text-center">
             <div className="form-signin">
@@ -15,12 +19,16 @@ const Register = () => {
                         repeat_password: Yup.string().oneOf([Yup.ref("password"), null], "Password must match.")
                     })}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
-                        setSubmitting(true)
-                        setTimeout(() => {
-                        alert(JSON.stringify(values, null, 2));
-                            resetForm();
-                            setSubmitting(false);
-                        }, 400);
+                        setSubmitting(true);
+                        API.post("/users", values).then((response) => {
+                            if (response.status === 201) {
+                                localStorage.setItem("userinfo", JSON.stringify(response.data))
+                                setSubmitting(false);
+                                navigate("/", { replace: true });
+                            }
+                        }).catch(reason => {
+                            console.log(reason)
+                        })
                     }}
                 >
                 {( {values,

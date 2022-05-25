@@ -14,3 +14,8 @@ RUN golangci-lint --version
 RUN useradd -m -s /bin/bash appuser
 USER appuser
 WORKDIR /home/appuser
+
+COPY . .
+EXPOSE 9001
+
+CMD [ "go", "run", "server.go" ]

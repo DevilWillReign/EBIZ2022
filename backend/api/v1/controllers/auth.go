@@ -8,7 +8,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -26,6 +26,19 @@ func GetAuthGroup(e *echo.Group) {
 	g.GET("/:id", getAuthById, utils.CheckAutorization)
 	g.GET("/:provider/login", authWithOAuth)
 	g.GET("/:provider/callback", authWithOAuthCallback)
+	g.GET("/login", authWithUser)
+}
+
+func authWithUser(c echo.Context) error {
+	user := new(models.UserLogin)
+	if err := utils.BindAndValidateObject(c, user); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	userData, err := services.LoginWithUser(c.Get("db").(*gorm.DB), *user)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, userData)
 }
 
 func authWithOAuth(c echo.Context) error {
@@ -68,6 +81,7 @@ func authWithOAuthCallback(c echo.Context) error {
 	}
 	sess.Values["redirect"] = nil
 	sess.Values["userinfo"] = data
+	log.Println(data)
 	sess.Save(c.Request(), c.Response())
 	return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 }
@@ -97,23 +111,16 @@ func generateStateOauthCookie(c echo.Context) string {
 // 	log.Println(details.Error, details.ErrorDescription)
 // }
 
-func getUserDataFromProvider(code string, oauthConfig *oauth2.Config, provider string) ([]byte, error) {
+func getUserDataFromProvider(code string, oauthConfig *oauth2.Config, provider string) (*models.UserData, error) {
 	token, err := oauthConfig.Exchange(context.Background(), code)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	req := auth.GetUserDataClient(provider, token)
-	httpClinet := &http.Client{}
-	response, err := httpClinet.Do(req)
+	userData, err := auth.GetUserData(provider, token)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	defer response.Body.Close()
-	contents, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-	return contents, nil
+	return userData, nil
 }
 
 func getAuths(c echo.Context) error {

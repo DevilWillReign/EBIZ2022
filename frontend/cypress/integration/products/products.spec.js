@@ -2,13 +2,13 @@
 
 describe("products component test", () => {
     beforeEach(() => {
-        cy.intercept(Cypress.env.arguments("api_url") + "/products", [
+        cy.intercept(Cypress.env("api_url") + "/products", [
             {id: 1, name: "Name1", code: "Code1"},
             {id: 2, name: "Name2", code: "Code2"},
             {id: 3, name: "Name3", code: "Code3"},
             {id: 4, name: "Name4", code: "Code4"}
         ])
-        cy.visit(Cypress.env.arguments("front_url") + "/products")
+        cy.visit(Cypress.env("front_url") + "/products")
     })
 
     it("display product list", () => {
@@ -30,9 +30,12 @@ describe("products component test", () => {
     })
 
     it("should go to product", () => {
+        cy.intercept(Cypress.env("api_url") + "/products/1",
+            {id: 1, name: "Name1", code: "Code1", price: 1.05, availability: 40, description: "Description1"}
+        )
         cy.get("#product-list li").should("have.length", 4)
         cy.get("#product-list li").first().should("have.text", "Code1 Name1")
-        cy.get("#product-list li").first().get("a").click()
-        cy.location().contains("products/1")
+        cy.get("#product-list li a").first().click()
+        cy.location("href").should("contain", "products/1")
     })
 })

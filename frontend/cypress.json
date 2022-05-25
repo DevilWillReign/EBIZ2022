@@ -1,1 +1,3 @@
-{}
+{
+    "ignoreTestFiles": ["**/1-getting-started/*.spec.js", "**/2-advanced-examples/*.spec.js"]
+}

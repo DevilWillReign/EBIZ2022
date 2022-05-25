@@ -2,7 +2,7 @@
 
 describe("home component test", () => {
     beforeEach(() => {
-        cy.visit(Cypress.env.arguments("front_url"))
+        cy.visit(Cypress.env("front_url"))
     })
 
     it("display product carousel", () => {
@@ -16,13 +16,13 @@ describe("home component test", () => {
 
     it("display product carousel inner", () => {
         cy.get("#productCarousel .carousel-inner").should("exist")
-        cy.get("#productCarousel .carousel-indicators .carousel-item").should("have.length", 4)
+        cy.get("#productCarousel .carousel-inner .carousel-item").should("have.length", 4)
     })
 
     it("display product carousel inner item", () => {
         cy.get("#productCarousel .carousel-inner").should("exist")
-        cy.get("#productCarousel .carousel-indicators .carousel-item").first().should("exist")
-        cy.get("#productCarousel .carousel-indicators .carousel-item").first().get("img").should("have.property", "alt", "morrison")
+        cy.get("#productCarousel .carousel-inner .carousel-item").first().should("exist")
+        cy.get("#productCarousel .carousel-inner .carousel-item img").first().should("have.prop", "alt", "morrison")
     })
 
     it("display product carousel prev button", () => {

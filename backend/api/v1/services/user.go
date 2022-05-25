@@ -10,6 +10,14 @@ import (
 	"gorm.io/gorm"
 )
 
+func GetUserByEmail(db *gorm.DB, email string) (models.User, error) {
+	userDTO, err := daos.GetUserByEmail(db, email)
+	if err != nil {
+		return models.User{}, echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return copyUserProperties(userDTO), nil
+}
+
 func GetUsers(db *gorm.DB) ([]models.User, error) {
 	userDTOs, err := daos.GetUsers(db)
 	if err != nil {

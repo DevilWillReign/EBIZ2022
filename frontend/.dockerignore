@@ -1,0 +1,6 @@
+*.env
+cypress/
+cypress*.json
+browserstack.json
+README.md
+node_modules/

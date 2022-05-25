@@ -10,6 +10,7 @@ import MainLayout from "../components/MainLayout"
 import Product from "../components/products/Product"
 import Transactions from "../components/profile/Transactions"
 import About from "../components/common/About"
+import Logout from "../components/auth/Logout"
 
 const routes = [
     {
@@ -31,7 +32,7 @@ const routes = [
                 element: <Products />
             },
             {
-                path: ":id",
+                path: ":productId",
                 element: <Product />
             }
         ]
@@ -47,11 +48,15 @@ const routes = [
             {
                 path: "register",
                 element: <Register />
+            },
+            {
+                path: "logout",
+                element: <Logout />
             }
         ]
     },
     {
-        path: "/profile/",
+        path: "/profile",
         element: <MainLayout />,
         children: [
             {

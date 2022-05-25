@@ -10,6 +10,14 @@ import (
 	"gorm.io/gorm"
 )
 
+func LoginWithUser(db *gorm.DB, user models.UserLogin) (models.UserData, error) {
+	userFromDB, err := GetUserByEmail(db, user.Email)
+	if err != nil {
+		return models.UserData{}, err
+	}
+	return models.UserData{Name: userFromDB.Username, Email: userFromDB.Email}, nil
+}
+
 func GetAuths(db *gorm.DB) ([]models.Auth, error) {
 	authDTOs, err := daos.GetAuths(db)
 	if err != nil {

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { NavLink } from "react-router-dom"
 
 const Cart = () => {
-    const [cart, setCart] = useState(sessionStorage.getItem("cart") == null ? [] : JSON.parse(sessionStorage.getItem("cart")))
+    const [cart, setCart] = useState(localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [])
 
     const buyForProducts = (event) => {
 
@@ -13,30 +13,37 @@ const Cart = () => {
         let index = currentCart.indexOf(product)
         if (index > -1) {
             currentCart.splice(index, 1)
-            sessionStorage.setItem("cart", JSON.stringify(currentCart))
-            setCart(currentCart)
+            localStorage.setItem("cart", JSON.stringify(currentCart))
         }
+        setCart([...currentCart])
     }
 
     return (
         <>
-            <ol class="list-group list-group-numbered">
-                {
-                    cart.map((element) => {
-                        return (
-                            <li id={element.id} key={element.id} className="list-group-item d-flex justify-content-between align-items-start">
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold"><NavLink to={"/products" + element.id}>{element.product_name}</NavLink></div>
-                                {element.code}
-                            </div>
-                            <span class="badge bg-primary rounded-pill">{element.quantity}</span>
-                            <button onClick={(e) => removeProduct(e, element)}>Remove</button>
-                            </li>
-                        )
-                    })
-                }
-            </ol>
-            <button onClick={(e) => buyForProducts(e)}>Pay</button>
+            { cart.length === 0 ? 
+                <h3 id="cart-empty">Cart empty</h3>
+                : (
+                    <>
+                        <ol id="cart-list" className="list-group list-group-numbered">
+                            {
+                                cart.map((product) => {
+                                    return (
+                                        <li id={product.id} key={product.id} className="list-group-item d-flex justify-content-between align-items-start">
+                                        <div className="ms-2 me-auto">
+                                            <div className="fw-bold"><NavLink to={"/products" + product.id}>{product.name}</NavLink></div>
+                                            {product.code}
+                                        </div>
+                                        <span className="badge bg-primary rounded-pill">{product.quantity}</span>
+                                        <button className="btn btn-close" onClick={(e) => removeProduct(e, product)}></button>
+                                        </li>
+                                    )
+                                })
+                            }
+                        </ol>
+                        <button id="cart-pay" className="btn btn-primary" onClick={(e) => buyForProducts(e)}>Pay</button>
+                    </>
+                ) 
+            }
         </>
     )
 }

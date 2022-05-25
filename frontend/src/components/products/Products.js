@@ -19,10 +19,10 @@ const Products = () => {
     return (
         <ul id="product-list" className="list-group">
             {
-                products.map(element => {
+                products.map(product => {
                     return (
-                        <li className="list-group-item" key={element.id}>
-                            <NavLink to={element.id}>{element.code} {element.name}</NavLink>
+                        <li className="list-group-item" key={product.id}>
+                            <NavLink to={"" + product.id}>{product.code} {product.name}</NavLink>
                         </li>
                     )
                 })

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import myRange from "../../util"
+import { NavLink, useParams } from "react-router-dom"
+import myRange from "../../util/util"
+import API from "../../util/api"
 
 const Product = () => {
-    const { product, setProduct } = useState({})
+    const [ product, setProduct ] = useState({})
+    const [ quantity, setQuantity ] = useState(1)
     const { productId } = useParams()
 
     useEffect(() => {
-        console.log(API.defaults)
         API.get("/products/" + productId).then((response) => {
             if (response.status === 200) {
                 const product = response.data
@@ -16,19 +17,29 @@ const Product = () => {
         }).catch((reason) => {
             console.log(reason)
         })
-    }, [])
+    }, [productId])
+    
+
+    const findProductInArray = (array, product) => {
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].code === product.code) {
+                return i
+            }
+        }
+        return -1
+    }
 
     const addProductToCart = (event) => {
         let productWithQuantity = product
-        productWithQuantity.quantity = document.getElementById("product-quantity").value
-        let cart = sessionStorage.getItem("cart") == null ? JSON.parse(sessionStorage.getItem("cart")) : []
-        let index = cart.indexOf(productWithQuantity)
+        productWithQuantity.quantity = Number(quantity)
+        let cart = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : []
+        let index = findProductInArray(cart, productWithQuantity)
         if (index > -1) {
             cart[index] = productWithQuantity
         } else {
             cart.push(productWithQuantity)
         }
-        sessionStorage.setItem("cart", JSON.stringify(cart))
+        localStorage.setItem("cart", JSON.stringify(cart))
     }
 
     return (
@@ -39,15 +50,18 @@ const Product = () => {
                 <li id="product-availability" className="list-group-item">Product availability: {product.availability ? product.availability : "no data"}</li>
                 <li id="product-price" className="list-group-item">Product price: {product.price ? product.price : "no data"}</li>
                 <li id="product-description" className="list-group-item">Product description: {product.description ? product.description : "no data"}</li>
+                <li id="product-quantity" className="list-group-item">
+                    <select onChange={(e) => setQuantity(e.target.value)} value={quantity} id="product-quantity-selector">
+                        {myRange(product.availability ? product.availability : 0, 1).map(value => {
+                            return (
+                                <option key={value} value={value}>{value}</option>
+                            )
+                        })}
+                    </select>
+                </li>
             </ul>
-            <select id="product-quantity">
-            {myRange(product.availability ? product.availability : 0, 1).map(value => {
-                return (
-                    <option value={value}>{value}</option>
-                )
-            })}
-            </select>
-            <button id="add-product" className="btn btn-lg btn-primary" onClick={(e) => addProductToCart(e)}>Add to cart</button>
+            <button id="add-product" className="btn btn-primary" onClick={(e) => addProductToCart(e)}>Add to cart</button>
+            <NavLink to="/products" className="btn btn-primary">Back to product list</NavLink>
         </>
     )
 }

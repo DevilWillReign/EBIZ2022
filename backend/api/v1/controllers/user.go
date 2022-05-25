@@ -41,7 +41,7 @@ func addUser(c echo.Context) error {
 	if err := services.AddUser(c.Get("db").(*gorm.DB), *user); err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusCreated)
+	return c.JSON(http.StatusCreated, models.UserData{Name: user.Username, Email: user.Email})
 }
 
 func getUserById(c echo.Context) error {

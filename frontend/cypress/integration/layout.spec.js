@@ -2,7 +2,7 @@
 
 describe("layout component test", () => {
     beforeEach(() => {
-        cy.visit(Cypress.env.arguments("front_url"))
+        cy.visit(Cypress.env("front_url"))
     })
 
     it("check header element", () => {

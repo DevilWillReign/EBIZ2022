@@ -1,8 +1,11 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
 import * as Yup from "yup"
+import API from "../../util/api"
 import './Login.css'
 
 const Login = () => {
+    const api_url = API.defaults.baseURL
+
     return (
         <div className="text-center">
             <div className="form-signin">
@@ -13,10 +16,15 @@ const Login = () => {
                         password: Yup.string().required("Required")
                     })}
                     onSubmit={(values, { setSubmitting }) => {
-                        setTimeout(() => {
-                        alert(JSON.stringify(values, null, 2));
-                        setSubmitting(false);
-                        }, 400);
+                        setSubmitting(true);
+                        API.post("/auths/login", JSON.stringify(values, null, 2)).then((response) => {
+                            if (response.status === 200) {
+                                localStorage.setItem("userinfo", JSON.stringify(response.data))
+                                setSubmitting(false);
+                            }
+                        }).catch(reason => {
+                            console.log(reason)
+                        })
                     }}
                 >
                 {( {values,
@@ -47,8 +55,8 @@ const Login = () => {
                 </Formik>
                 <hr />
                 <div>
-                    <a className="btn btn-lg btn-secondary w-100 mb-1" href="http://localhost:9000/api/v1/auths/google/login?redirect_url=http://localhost:9001/login">Google Login</a>
-                    <a className="btn btn-lg btn-secondary w-100" href="http://localhost:9000/api/v1/auths/github/login?redirect_url=http://localhost:9001/login">Github Login</a>
+                    <a className="btn btn-lg btn-secondary w-100 mb-1" href={api_url + "/auths/google/login?redirect_url=" + window.location}>Google Login</a>
+                    <a className="btn btn-lg btn-secondary w-100" href={api_url + "/auths/github/login?redirect_url=" + window.location}>Github Login</a>
                 </div>
             </div>
         </div>

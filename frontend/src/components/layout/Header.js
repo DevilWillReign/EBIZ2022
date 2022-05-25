@@ -25,7 +25,7 @@ const routes = (loggedIn) => [
 ]
 
 const Header = () => {
-    var [loggedIn, setLoggedIn] = useState(sessionStorage.getItem("userinfo") !== null)
+    const [loggedIn, setLoggedIn] = useState(localStorage.getItem("userinfo") !== null)
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
