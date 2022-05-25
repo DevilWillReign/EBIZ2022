@@ -1,10 +1,12 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
 import * as Yup from "yup"
+import { useHref, useLocation, useNavigate } from "react-router-dom"
 import API from "../../util/api"
 import './Login.css'
 
 const Login = () => {
     const api_url = API.defaults.baseURL
+    const location = useLocation()
 
     return (
         <div className="text-center">
@@ -55,8 +57,8 @@ const Login = () => {
                 </Formik>
                 <hr />
                 <div>
-                    <a className="btn btn-lg btn-secondary w-100 mb-1" href={api_url + "/auths/google/login?redirect_url=" + window.location}>Google Login</a>
-                    <a className="btn btn-lg btn-secondary w-100" href={api_url + "/auths/github/login?redirect_url=" + window.location}>Github Login</a>
+                    <a className="btn btn-lg btn-secondary w-100 mb-1" href={api_url + "/auths/google/login?redirect_url=" + location.pathname} >Google Login</a>
+                    <a className="btn btn-lg btn-secondary w-100" href={api_url + "/auths/github/login?redirect_url=" + location.pathname}>Github Login</a>
                 </div>
             </div>
         </div>

@@ -10,6 +10,8 @@ import (
 	"encoding/base64"
 	"log"
 	"net/http"
+	"net/url"
+	"path"
 	"strconv"
 	"time"
 
@@ -47,8 +49,10 @@ func authWithOAuth(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, c.Param("provider"))
 	}
 	oauthState := generateStateOauthCookie(c)
+	referer, _ := url.Parse(c.Request().Referer())
+	referer.Path = path.Join(referer.Path, c.QueryParam("redirect_url"))
 	sess := utils.GetSession(c)
-	sess.Values["redirect"] = c.QueryParam("redirect_url")
+	sess.Values["redirect"] = referer.String()
 	sess.Save(c.Request(), c.Response())
 	oauthConfigUrl := oauthConfig.AuthCodeURL(oauthState, oauth2.AccessTypeOffline)
 	return c.Redirect(http.StatusTemporaryRedirect, oauthConfigUrl)
@@ -82,6 +86,7 @@ func authWithOAuthCallback(c echo.Context) error {
 	sess.Values["redirect"] = nil
 	sess.Values["userinfo"] = data
 	log.Println(data)
+	log.Println(redirect)
 	sess.Save(c.Request(), c.Response())
 	return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 }
