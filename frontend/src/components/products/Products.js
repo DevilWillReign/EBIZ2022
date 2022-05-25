@@ -8,8 +8,7 @@ const Products = () => {
     useEffect(() => {
         API.get("/products").then((response) => {
             if (response.status === 200) {
-                const products = response.data
-                setProducts(products)
+                setProducts(response.data)
             }
         }).catch((reason) => {
             console.log(reason)

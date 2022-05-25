@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { NavLink, useParams } from "react-router-dom"
-import myRange from "../../util/util"
+import myRange from "../../util/myRange"
 import API from "../../util/api"
 
 const Product = () => {
@@ -11,8 +11,7 @@ const Product = () => {
     useEffect(() => {
         API.get("/products/" + productId).then((response) => {
             if (response.status === 200) {
-                const product = response.data
-                setProduct(product)
+                setProduct(response.data)
             }
         }).catch((reason) => {
             console.log(reason)
@@ -29,7 +28,7 @@ const Product = () => {
         return -1
     }
 
-    const addProductToCart = (event) => {
+    const addProductToCart = () => {
         let productWithQuantity = product
         productWithQuantity.quantity = Number(quantity)
         let cart = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : []

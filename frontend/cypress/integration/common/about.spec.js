@@ -26,7 +26,7 @@ describe("about component test", () => {
         cy.get("#about .accordion-item .accordion-collapse").first().should("exist")
         cy.get("#about .accordion-item .accordion-collapse .accordion-body").first().should("exist")
         cy.get("#about .accordion-item .accordion-collapse .accordion-body").first().should("have.text",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \
+        `Lorem ipsum dolor sit amet, consectetur adipiscing elit. \
 Etiam efficitur metus sed nisl viverra, et condimentum arcu varius. \
 Maecenas sodales elementum justo. Nulla eleifend convallis ipsum eget aliquam. \
 Cras sem ipsum, consequat in odio at, elementum vulputate dolor. \
@@ -34,6 +34,6 @@ Quisque eu mauris enim. \
 Curabitur porttitor, tellus blandit euismod feugiat, eros quam ultrices lorem, sit amet tristique massa nisl sed diam. \
 Vestibulum sollicitudin ligula sed tellus dictum, nec blandit leo rhoncus. \
 Aliquam lacinia, turpis eget scelerisque pulvinar, felis leo consectetur lacus, vel maximus ipsum urna nec metus. \
-Praesent molestie non diam sit amet accumsan.")
+Praesent molestie non diam sit amet accumsan.`)
     })
 })

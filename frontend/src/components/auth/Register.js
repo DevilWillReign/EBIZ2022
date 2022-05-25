@@ -24,6 +24,7 @@ const Register = () => {
                             if (response.status === 201) {
                                 localStorage.setItem("userinfo", JSON.stringify(response.data))
                                 setSubmitting(false);
+                                resetForm()
                                 navigate("/", { replace: true });
                             }
                         }).catch(reason => {

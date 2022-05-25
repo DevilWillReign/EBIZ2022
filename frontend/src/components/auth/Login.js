@@ -1,12 +1,13 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
 import * as Yup from "yup"
-import { useHref, useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import API from "../../util/api"
 import './Login.css'
 
 const Login = () => {
     const api_url = API.defaults.baseURL
     const location = useLocation()
+    const navigate = useNavigate()
 
     return (
         <div className="text-center">
@@ -23,6 +24,7 @@ const Login = () => {
                             if (response.status === 200) {
                                 localStorage.setItem("userinfo", JSON.stringify(response.data))
                                 setSubmitting(false);
+                                navigate("/", { replace: true })
                             }
                         }).catch(reason => {
                             console.log(reason)

@@ -4,11 +4,11 @@ import { NavLink } from "react-router-dom"
 const Cart = () => {
     const [cart, setCart] = useState(localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [])
 
-    const buyForProducts = (event) => {
-
+    const buyForProducts = () => {
+        console.log("Paying")
     }
     
-    const removeProduct = (event, product) => {
+    const removeProduct = (product) => {
         let currentCart = cart
         let index = currentCart.indexOf(product)
         if (index > -1) {
@@ -34,7 +34,7 @@ const Cart = () => {
                                             {product.code}
                                         </div>
                                         <span className="badge bg-primary rounded-pill">{product.quantity}</span>
-                                        <button className="btn btn-close" onClick={(e) => removeProduct(e, product)}></button>
+                                        <button className="btn btn-close" onClick={() => removeProduct(product)}></button>
                                         </li>
                                     )
                                 })
