@@ -38,12 +38,12 @@ func DeleteCategoryById(db *gorm.DB, id uint64) error {
 	return nil
 }
 
-func AddCategory(db *gorm.DB, category models.Category) error {
-	err := daos.AddCategory(db, copyCategoryDTOProperties(category))
+func AddCategory(db *gorm.DB, category models.Category) (models.Category, error) {
+	categoryDTO, err := daos.AddCategory(db, copyCategoryDTOProperties(category))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return models.Category{}, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return nil
+	return copyCategoryProperties(categoryDTO), nil
 }
 
 func ReplaceCategory(db *gorm.DB, id uint64, category models.Category) error {

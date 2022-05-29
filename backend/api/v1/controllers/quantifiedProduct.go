@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"apprit/store/api/v1/auth"
 	"apprit/store/api/v1/models"
 	"apprit/store/api/v1/services"
 	"apprit/store/api/v1/utils"
@@ -8,16 +9,18 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
 
 func GetQuantifiedProductGroup(e *echo.Group) {
 	g := e.Group("/quantifiedProducts")
-	g.GET("", getQuantifiedProducts, utils.CheckAutorization)
-	g.POST("", addQuantifiedProduct, utils.CheckAutorization)
-	g.DELETE("/:id", deleteQuantifiedProductById, utils.CheckAutorization)
-	g.GET("/:id", getQuantifiedProductById, utils.CheckAutorization)
-	g.PUT("/:id", replaceQuantifiedProductById, utils.CheckAutorization)
+	g.Use(middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.GET("", getQuantifiedProducts)
+	g.POST("", addQuantifiedProduct)
+	g.DELETE("/:id", deleteQuantifiedProductById)
+	g.GET("/:id", getQuantifiedProductById)
+	g.PUT("/:id", replaceQuantifiedProductById)
 }
 
 func getQuantifiedProducts(c echo.Context) error {
@@ -33,7 +36,7 @@ func addQuantifiedProduct(c echo.Context) error {
 	if err := utils.BindAndValidateObject(c, quantifiedProduct); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := services.AddQuantifiedProduct(c.Get("db").(*gorm.DB), *quantifiedProduct); err != nil {
+	if _, err := services.AddQuantifiedProduct(c.Get("db").(*gorm.DB), *quantifiedProduct); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)

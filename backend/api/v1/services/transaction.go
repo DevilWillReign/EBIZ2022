@@ -38,12 +38,12 @@ func DeleteTransactionById(db *gorm.DB, id uint64) error {
 	return nil
 }
 
-func AddTransaction(db *gorm.DB, transaction models.Transaction) error {
-	err := daos.AddTransaction(db, copyTransactionDTOProperties(transaction))
+func AddTransaction(db *gorm.DB, transaction models.Transaction) (models.Transaction, error) {
+	transactionDTO, err := daos.AddTransaction(db, copyTransactionDTOProperties(transaction))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return models.Transaction{}, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return nil
+	return copyTransactionProperties(transactionDTO), nil
 }
 
 func ReplaceTransaction(db *gorm.DB, id uint64, transaction models.Transaction) error {

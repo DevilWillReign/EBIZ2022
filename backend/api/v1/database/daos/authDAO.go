@@ -21,7 +21,7 @@ func DeleteAuthById(db *gorm.DB, id uint64) error {
 	return DeleteEntityById(db, id, &authDTO)
 }
 
-func AddAuth(db *gorm.DB, authDTO dtos.AuthDTO) error {
+func AddAuth(db *gorm.DB, authDTO dtos.AuthDTO) (dtos.AuthDTO, error) {
 	return AddEntity(db, &authDTO)
 }
 

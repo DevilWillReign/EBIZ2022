@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"apprit/store/api/v1/auth"
 	"apprit/store/api/v1/models"
 	"apprit/store/api/v1/services"
 	"apprit/store/api/v1/utils"
@@ -8,16 +9,17 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
 
 func GetProductGroup(e *echo.Group) {
 	g := e.Group("/products")
 	g.GET("", getProducts)
-	g.POST("", addProduct, utils.CheckAutorization)
-	g.DELETE("/:id", deleteProductById, utils.CheckAutorization)
+	g.POST("", addProduct, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.DELETE("/:id", deleteProductById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 	g.GET("/:id", getProductById)
-	g.PUT("/:id", replaceProductById, utils.CheckAutorization)
+	g.PUT("/:id", replaceProductById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 }
 
 func getProducts(c echo.Context) error {
@@ -33,7 +35,7 @@ func addProduct(c echo.Context) error {
 	if err := utils.BindAndValidateObject(c, product); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := services.AddProduct(c.Get("db").(*gorm.DB), *product); err != nil {
+	if _, err := services.AddProduct(c.Get("db").(*gorm.DB), *product); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)

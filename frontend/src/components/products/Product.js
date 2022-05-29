@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { NavLink, useParams } from "react-router-dom"
 import myRange from "../../util/myRange"
-import API from "../../util/api"
+import { API } from "../../util/api"
 
 const Product = () => {
     const [ product, setProduct ] = useState({})
@@ -19,9 +19,9 @@ const Product = () => {
     }, [productId])
     
 
-    const findProductInArray = (array, product) => {
+    const findProductInArray = (array, productToFind) => {
         for (var i = 0; i < array.length; i++) {
-            if (array[i].code === product.code) {
+            if (array[i].code === productToFind.code) {
                 return i
             }
         }
@@ -59,7 +59,7 @@ const Product = () => {
                     </select>
                 </li>
             </ul>
-            <button id="add-product" className="btn btn-primary" onClick={(e) => addProductToCart(e)}>Add to cart</button>
+            <button id="add-product" className="btn btn-primary" onClick={() => addProductToCart()}>Add to cart</button>
             <NavLink to="/products" className="btn btn-primary">Back to product list</NavLink>
         </>
     )

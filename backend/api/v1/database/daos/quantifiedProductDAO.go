@@ -21,7 +21,7 @@ func DeleteQuantifiedProductById(db *gorm.DB, id uint64) error {
 	return DeleteEntityById(db, id, &quantifiedProductDTO)
 }
 
-func AddQuantifiedProduct(db *gorm.DB, quantifiedProductDTO dtos.QuantifiedProductDTO) error {
+func AddQuantifiedProduct(db *gorm.DB, quantifiedProductDTO dtos.QuantifiedProductDTO) (dtos.QuantifiedProductDTO, error) {
 	return AddEntity(db, &quantifiedProductDTO)
 }
 

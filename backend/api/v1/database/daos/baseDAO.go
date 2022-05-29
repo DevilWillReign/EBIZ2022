@@ -27,11 +27,11 @@ func DeleteEntityById[E dtos.Entity](db *gorm.DB, id uint64, entity *E) error {
 	return nil
 }
 
-func AddEntity[E dtos.Entity](db *gorm.DB, entity *E) error {
+func AddEntity[E dtos.Entity](db *gorm.DB, entity *E) (E, error) {
 	if err := db.Create(entity).Error; err != nil {
-		return err
+		return *entity, err
 	}
-	return nil
+	return *entity, nil
 }
 
 func ReplaceEntity[E dtos.Entity](db *gorm.DB, id uint64, newValues map[string]interface{}, e *E) error {

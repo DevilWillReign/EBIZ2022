@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"apprit/store/api/v1/auth"
 	"apprit/store/api/v1/models"
 	"apprit/store/api/v1/services"
 	"apprit/store/api/v1/utils"
@@ -8,16 +9,18 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
 
 func GetTransactionGroup(e *echo.Group) {
 	g := e.Group("/transactions")
-	g.GET("", getTransactions, utils.CheckAutorization)
-	g.POST("", addTransaction, utils.CheckAutorization)
-	g.DELETE("/:id", deleteTransactionById, utils.CheckAutorization)
-	g.GET("/:id", getTransactionById, utils.CheckAutorization)
-	g.PUT("/:id", replaceTransactionById, utils.CheckAutorization)
+	g.Use(middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.GET("", getTransactions)
+	g.POST("", addTransaction)
+	g.DELETE("/:id", deleteTransactionById)
+	g.GET("/:id", getTransactionById)
+	g.PUT("/:id", replaceTransactionById)
 }
 
 func getTransactions(c echo.Context) error {
@@ -33,7 +36,7 @@ func addTransaction(c echo.Context) error {
 	if err := utils.BindAndValidateObject(c, transaction); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := services.AddTransaction(c.Get("db").(*gorm.DB), *transaction); err != nil {
+	if _, err := services.AddTransaction(c.Get("db").(*gorm.DB), *transaction); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)

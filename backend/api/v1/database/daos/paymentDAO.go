@@ -21,7 +21,7 @@ func DeletePaymentById(db *gorm.DB, id uint64) error {
 	return DeleteEntityById(db, id, &paymentDTO)
 }
 
-func AddPayment(db *gorm.DB, paymentDTO dtos.PaymentDTO) error {
+func AddPayment(db *gorm.DB, paymentDTO dtos.PaymentDTO) (dtos.PaymentDTO, error) {
 	return AddEntity(db, &paymentDTO)
 }
 

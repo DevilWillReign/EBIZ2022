@@ -54,6 +54,7 @@ func main() {
 	controllers.GetProductGroup(api)
 	controllers.GetQuantifiedProductGroup(api)
 	controllers.GetTransactionGroup(api)
+	controllers.GetUsersGroup(api)
 	controllers.GetUserGroup(api)
 	e.Logger.Fatal(e.Start(utils.GetEnv("HOST", "") + ":" + utils.GetEnv("PORT", "9000")))
 }

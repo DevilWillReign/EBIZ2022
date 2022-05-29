@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
 
 const routes = (loggedIn) => [
@@ -26,6 +26,10 @@ const routes = (loggedIn) => [
 
 const Header = () => {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem("userinfo") !== null)
+
+    useEffect(() => {
+        setLoggedIn(localStorage.getItem("userinfo") !== null)
+    })
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">

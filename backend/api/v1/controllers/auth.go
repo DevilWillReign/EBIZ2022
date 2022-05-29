@@ -8,7 +8,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -16,22 +15,25 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
 
 func GetAuthGroup(e *echo.Group) {
 	g := e.Group("/auths")
-	g.GET("", getAuths, utils.CheckAutorization)
-	g.POST("", addAuth, utils.CheckAutorization)
-	g.DELETE("/:id", deleteAuthById, utils.CheckAutorization)
-	g.GET("/:id", getAuthById, utils.CheckAutorization)
+	g.GET("", getAuths, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.POST("", addAuth, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.DELETE("/:id", deleteAuthById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.GET("/:id", getAuthById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 	g.GET("/:provider/login", authWithOAuth)
 	g.GET("/:provider/callback", authWithOAuthCallback)
-	g.GET("/login", authWithUser)
+	g.POST("/login", authLogin)
+	g.GET("/logout", authLogout, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.POST("/token", authTokenLocal)
 }
 
-func authWithUser(c echo.Context) error {
+func authTokenLocal(c echo.Context) error {
 	user := new(models.UserLogin)
 	if err := utils.BindAndValidateObject(c, user); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -40,13 +42,50 @@ func authWithUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, userData)
+	t, err := auth.CreateToken(userData)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"token": t,
+	})
+}
+
+func authLogout(c echo.Context) error {
+	c.SetCookie(&http.Cookie{Name: "userinfo", Value: "", HttpOnly: true, Secure: true, SameSite: http.SameSiteStrictMode, Expires: time.Unix(0, 0), Path: "/"})
+	return c.NoContent(http.StatusOK)
+}
+
+func authLogin(c echo.Context) error {
+	user := new(models.UserLogin)
+	if err := utils.BindAndValidateObject(c, user); err != nil {
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	userData, err := services.LoginWithUser(c.Get("db").(*gorm.DB), *user)
+	if err != nil {
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		return err
+	}
+
+	t, err := auth.CreateToken(userData)
+	if err != nil {
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	c.SetCookie(utils.GetTokenCookie(t))
+	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success"})
+	return c.NoContent(http.StatusOK)
 }
 
 func authWithOAuth(c echo.Context) error {
 	oauthConfig := auth.GetAuthConfig(c.Param("provider"))
 	if oauthConfig == nil {
-		return echo.NewHTTPError(http.StatusBadRequest, c.Param("provider"))
+		return c.Redirect(http.StatusPermanentRedirect, c.Request().Referer())
+	}
+	redirectUrl := c.QueryParam("redirect_url")
+	if redirectUrl == "" {
+		return c.Redirect(http.StatusPermanentRedirect, c.Request().Referer())
 	}
 	oauthState := generateStateOauthCookie(c)
 	referer, _ := url.Parse(c.Request().Referer())
@@ -71,23 +110,37 @@ func authWithOAuthCallback(c echo.Context) error {
 	if redirect == nil {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
+	redirectUrl, _ := url.Parse(redirect.(string))
 
 	if c.FormValue("state") != oauthState.Value {
 		sess.Values["redirect"] = nil
 		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusUnauthorized, redirect.(string))
+		c.SetCookie(&http.Cookie{Name: "oauthstate", Value: "", Expires: time.Unix(0, 0)})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Path: redirectUrl.Path})
+		return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 	}
 	data, err := getUserDataFromProvider(c.FormValue("code"), oauthConfig, c.Param("provider"))
 	if err != nil {
 		sess.Values["redirect"] = nil
 		sess.Save(c.Request(), c.Response())
-		return c.Redirect(http.StatusUnauthorized, redirect.(string))
+		c.SetCookie(&http.Cookie{Name: "oauthstate", Value: "", Expires: time.Unix(0, 0)})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Path: redirectUrl.Path})
+		return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 	}
 	sess.Values["redirect"] = nil
-	sess.Values["userinfo"] = data
-	log.Println(data)
-	log.Println(redirect)
 	sess.Save(c.Request(), c.Response())
+	db := c.Get("db").(*gorm.DB)
+	user, err := services.GetUserByEmail(db, data.Email)
+	if err != nil {
+		user, err = services.AddUser(db, models.User{Username: data.Name, Email: data.Email, Admin: false})
+	}
+	t, err := auth.CreateToken(models.ConverUserToUserData(user))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	c.SetCookie(utils.GetTokenCookie(t))
+	c.SetCookie(&http.Cookie{Name: "oauthstate", Value: "", Expires: time.Unix(0, 0)})
+	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success", Path: redirectUrl.Path})
 	return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 }
 
@@ -141,7 +194,7 @@ func addAuth(c echo.Context) error {
 	if err := utils.BindAndValidateObject(c, auth); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := services.AddAuth(c.Get("db").(*gorm.DB), *auth); err != nil {
+	if _, err := services.AddAuth(c.Get("db").(*gorm.DB), *auth); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)

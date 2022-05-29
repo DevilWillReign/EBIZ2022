@@ -1,11 +1,15 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
 import { useNavigate } from "react-router-dom"
 import * as Yup from "yup"
-import API from "../../util/api"
+import { API } from "../../util/api"
+import { useCookies } from "react-cookie"
+import { useState } from "react"
 import './Login.css'
 
 const Register = () => {
     const navigate = useNavigate()
+    const [removeCookies] = useCookies(["login_state"])
+    const [failed, setFailed] = useState(false)
 
     return (
         <div className="text-center">
@@ -22,13 +26,16 @@ const Register = () => {
                         setSubmitting(true);
                         API.post("/users", values).then((response) => {
                             if (response.status === 201) {
-                                localStorage.setItem("userinfo", JSON.stringify(response.data))
-                                setSubmitting(false);
+                                localStorage.setItem("userinfo", true)
+                                removeCookies()
                                 resetForm()
-                                navigate("/", { replace: true });
+                                setSubmitting(false);
+                                navigate("/", { replace: true })
                             }
                         }).catch(reason => {
-                            console.log(reason)
+                            setSubmitting(false);
+                            setFailed(true);
+                            removeCookies();
                         })
                     }}
                 >
@@ -39,33 +46,36 @@ const Register = () => {
                     handleBlur,
                     handleSubmit,
                     isSubmitting }) => (
-                        <Form
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            onSubmit={handleSubmit}
-                        >
-                            <div className="mb-1">
-                                <label htmlFor="username" className="form-label">Username</label>
-                                <Field name="username" value={values.username} type="text" className="form-control" />
-                                <div className={touched.username && errors.username ? "alert alert-danger" : null}><ErrorMessage name="username" className="valid-tooltip" /></div>
-                            </div>
-                            <div className="mb-1">
-                                <label htmlFor="email" className="form-label">Email</label>
-                                <Field name="email" value={values.email} type="email" className="form-control" />
-                                <div className={touched.email && errors.email ? "alert alert-danger" : null}><ErrorMessage name="email" className="valid-tooltip" /></div>
-                            </div>
-                            <div className="mb-1">
-                                <label htmlFor="password" className="form-label">Password</label>
-                                <Field name="password" value={values.password} type="password" className="form-control" />
-                                <div className={touched.password && errors.password ? "alert alert-danger" : null}><ErrorMessage name="password" className="valid-tooltip" /></div>
-                            </div>
-                            <div className="mb-1">
-                                <label htmlFor="repeat_password" className="form-label">Repeat Password</label>
-                                <Field name="repeat_password" value={values.repeat_password} type="password" className="form-control" />
-                                <div className={touched.repeat_password && errors.repeat_password ? "alert alert-danger" : null}><ErrorMessage name="repeat_password" className="valid-tooltip" /></div>
-                            </div>
-                            <button type="submit" className="btn btn-lg btn-primary w-100" disabled={isSubmitting}>Sign up</button>
-                        </Form>
+                        <>
+                        <div className={failed ? "alert alert-danger" : "d-none"}>Registration failed</div>
+                            <Form
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                onSubmit={handleSubmit}
+                            >
+                                <div className="mb-1">
+                                    <label htmlFor="username" className="form-label">Username</label>
+                                    <Field name="username" value={values.username} type="text" className="form-control" />
+                                    <div className={touched.username && errors.username ? "alert alert-danger" : null}><ErrorMessage name="username" className="valid-tooltip" /></div>
+                                </div>
+                                <div className="mb-1">
+                                    <label htmlFor="email" className="form-label">Email</label>
+                                    <Field name="email" value={values.email} type="email" className="form-control" />
+                                    <div className={touched.email && errors.email ? "alert alert-danger" : null}><ErrorMessage name="email" className="valid-tooltip" /></div>
+                                </div>
+                                <div className="mb-1">
+                                    <label htmlFor="password" className="form-label">Password</label>
+                                    <Field name="password" value={values.password} type="password" className="form-control" />
+                                    <div className={touched.password && errors.password ? "alert alert-danger" : null}><ErrorMessage name="password" className="valid-tooltip" /></div>
+                                </div>
+                                <div className="mb-1">
+                                    <label htmlFor="repeat_password" className="form-label">Repeat Password</label>
+                                    <Field name="repeat_password" value={values.repeat_password} type="password" className="form-control" />
+                                    <div className={touched.repeat_password && errors.repeat_password ? "alert alert-danger" : null}><ErrorMessage name="repeat_password" className="valid-tooltip" /></div>
+                                </div>
+                                <button type="submit" className="btn btn-lg btn-primary w-100" disabled={isSubmitting}>Sign up</button>
+                            </Form>
+                        </>
                 )}
                 </Formik>
             </div>

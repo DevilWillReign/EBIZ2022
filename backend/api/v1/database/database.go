@@ -44,6 +44,10 @@ func CreateDatabase() *gorm.DB {
 
 func InitializeDatabaseData(db *gorm.DB) {
 	productPrice, _ := decimal.NewFromString("1000000.05")
+	salt := make([]byte, 10)
+	rand.Read(salt)
+	key := argon2.IDKey([]byte("admin@example.com1234"), salt, 3, 32*1024, 4, 32)
+	db.Create(&dtos.UserDTO{Username: "adminin", Email: "admin@example.com", Password: string(key), Salt: salt, Admin: true})
 	for i := 1; i <= 5; i++ {
 		num := fmt.Sprint(i)
 		addCategoryIfNotExists(db, "Category"+num)

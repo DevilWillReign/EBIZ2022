@@ -4,18 +4,24 @@ import (
 	"apprit/store/api/v1/database/daos"
 	"apprit/store/api/v1/database/dtos"
 	"apprit/store/api/v1/models"
+	"crypto/subtle"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/argon2"
 	"gorm.io/gorm"
 )
 
 func LoginWithUser(db *gorm.DB, user models.UserLogin) (models.UserData, error) {
-	userFromDB, err := GetUserByEmail(db, user.Email)
+	userFromDB, err := daos.GetUserByEmail(db, user.Email)
 	if err != nil {
-		return models.UserData{}, err
+		return models.UserData{}, echo.ErrNotFound
 	}
-	return models.UserData{Name: userFromDB.Username, Email: userFromDB.Email}, nil
+	passwordHash := argon2.IDKey([]byte(user.Password), userFromDB.Salt, 3, 32*1024, 4, 32)
+	if subtle.ConstantTimeCompare(passwordHash, []byte(userFromDB.Password)) == 0 {
+		return models.UserData{}, echo.ErrBadRequest
+	}
+	return models.ConverUserToUserData(copyUserProperties(userFromDB)), nil
 }
 
 func GetAuths(db *gorm.DB) ([]models.Auth, error) {
@@ -46,12 +52,12 @@ func DeleteAuthById(db *gorm.DB, id uint64) error {
 	return nil
 }
 
-func AddAuth(db *gorm.DB, auth models.Auth) error {
-	err := daos.AddAuth(db, copyAuthDTOProperties(auth))
+func AddAuth(db *gorm.DB, auth models.Auth) (models.Auth, error) {
+	authDTO, err := daos.AddAuth(db, copyAuthDTOProperties(auth))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return models.Auth{}, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return nil
+	return copyAuthProperties(authDTO), nil
 }
 
 func ReplaceAuth(db *gorm.DB, id uint64, auth models.Auth) error {

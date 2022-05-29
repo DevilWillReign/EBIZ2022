@@ -40,12 +40,13 @@ func DeleteQuantifiedProductById(db *gorm.DB, id uint64) error {
 	return nil
 }
 
-func AddQuantifiedProduct(db *gorm.DB, quantifiedProduct models.QuantifiedProduct) error {
-	err := daos.AddQuantifiedProduct(db, copyQuantifiedProductDTOProperties(quantifiedProduct))
+func AddQuantifiedProduct(db *gorm.DB, quantifiedProduct models.QuantifiedProduct) (models.QuantifiedProduct, error) {
+	quantifiedProductDTO, err := daos.AddQuantifiedProduct(db, copyQuantifiedProductDTOProperties(quantifiedProduct))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return models.QuantifiedProduct{}, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return nil
+	productDTO, _ := daos.GetProductById(db, uint64(quantifiedProductDTO.ProductDTOID))
+	return copyQuantifiedProductProperties(quantifiedProductDTO, productDTO), nil
 }
 
 func ReplaceQuantifiedProduct(db *gorm.DB, id uint64, quantifiedProduct models.QuantifiedProduct) error {

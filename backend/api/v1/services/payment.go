@@ -38,12 +38,12 @@ func DeletePaymentById(db *gorm.DB, id uint64) error {
 	return nil
 }
 
-func AddPayment(db *gorm.DB, payment models.Payment) error {
-	err := daos.AddPayment(db, copyPaymentDTOProperties(payment))
+func AddPayment(db *gorm.DB, payment models.Payment) (models.Payment, error) {
+	paymentDTO, err := daos.AddPayment(db, copyPaymentDTOProperties(payment))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return models.Payment{}, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return nil
+	return copyPaymentProperties(paymentDTO), nil
 }
 
 func ReplacePayment(db *gorm.DB, id uint64, payment models.Payment) error {

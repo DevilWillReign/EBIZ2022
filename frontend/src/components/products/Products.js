@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { NavLink } from 'react-router-dom'
-import API from "../../util/api"
+import { API } from "../../util/api"
 
 const Products = () => {
     const [products, setProducts] = useState([])

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"apprit/store/api/v1/auth"
 	"apprit/store/api/v1/models"
 	"apprit/store/api/v1/services"
 	"apprit/store/api/v1/utils"
@@ -8,16 +9,17 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
 
 func GetCategoryGroup(e *echo.Group) {
 	g := e.Group("/categories")
 	g.GET("", getCategories)
-	g.POST("", addCategory, utils.CheckAutorization)
-	g.DELETE("/:id", deleteCategoryById, utils.CheckAutorization)
+	g.POST("", addCategory, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.DELETE("/:id", deleteCategoryById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 	g.GET("/:id", getCategoryById)
-	g.PUT("/:id", replaceCategoryById, utils.CheckAutorization)
+	g.PUT("/:id", replaceCategoryById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 }
 
 func getCategories(c echo.Context) error {
@@ -33,7 +35,7 @@ func addCategory(c echo.Context) error {
 	if err := utils.BindAndValidateObject(c, category); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := services.AddCategory(c.Get("db").(*gorm.DB), *category); err != nil {
+	if _, err := services.AddCategory(c.Get("db").(*gorm.DB), *category); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)

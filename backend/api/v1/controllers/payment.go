@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"apprit/store/api/v1/auth"
 	"apprit/store/api/v1/models"
 	"apprit/store/api/v1/services"
 	"apprit/store/api/v1/utils"
@@ -8,16 +9,18 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
 
 func GetPaymentGroup(e *echo.Group) {
 	g := e.Group("/payments")
-	g.GET("", getPayments, utils.CheckAutorization)
-	g.POST("", addPayment, utils.CheckAutorization)
-	g.DELETE("/:id", deletePaymentById, utils.CheckAutorization)
-	g.GET("/:id", getPaymentById, utils.CheckAutorization)
-	g.PUT("/:id", replacePaymentById, utils.CheckAutorization)
+	g.Use(middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.GET("", getPayments)
+	g.POST("", addPayment)
+	g.DELETE("/:id", deletePaymentById)
+	g.GET("/:id", getPaymentById)
+	g.PUT("/:id", replacePaymentById)
 }
 
 func getPayments(c echo.Context) error {
@@ -33,7 +36,7 @@ func addPayment(c echo.Context) error {
 	if err := utils.BindAndValidateObject(c, payment); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := services.AddPayment(c.Get("db").(*gorm.DB), *payment); err != nil {
+	if _, err := services.AddPayment(c.Get("db").(*gorm.DB), *payment); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)

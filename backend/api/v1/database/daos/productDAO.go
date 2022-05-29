@@ -21,7 +21,7 @@ func DeleteProductById(db *gorm.DB, id uint64) error {
 	return DeleteEntityById(db, id, &productDTO)
 }
 
-func AddProduct(db *gorm.DB, productDTO dtos.ProductDTO) error {
+func AddProduct(db *gorm.DB, productDTO dtos.ProductDTO) (dtos.ProductDTO, error) {
 	return AddEntity(db, &productDTO)
 }
 

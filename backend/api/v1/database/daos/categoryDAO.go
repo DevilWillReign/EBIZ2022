@@ -21,7 +21,7 @@ func DeleteCategoryById(db *gorm.DB, id uint64) error {
 	return DeleteEntityById(db, id, &categoryDTO)
 }
 
-func AddCategory(db *gorm.DB, categoryDTO dtos.CategoryDTO) error {
+func AddCategory(db *gorm.DB, categoryDTO dtos.CategoryDTO) (dtos.CategoryDTO, error) {
 	return AddEntity(db, &categoryDTO)
 }
 

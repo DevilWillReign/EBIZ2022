@@ -21,7 +21,7 @@ func DeleteTransactionById(db *gorm.DB, id uint64) error {
 	return DeleteEntityById(db, id, &transactionDTO)
 }
 
-func AddTransaction(db *gorm.DB, transactionDTO dtos.TransactionDTO) error {
+func AddTransaction(db *gorm.DB, transactionDTO dtos.TransactionDTO) (dtos.TransactionDTO, error) {
 	return AddEntity(db, &transactionDTO)
 }
 

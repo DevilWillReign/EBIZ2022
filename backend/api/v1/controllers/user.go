@@ -1,31 +1,69 @@
 package controllers
 
 import (
+	"apprit/store/api/v1/auth"
 	"apprit/store/api/v1/models"
 	"apprit/store/api/v1/services"
 	"apprit/store/api/v1/utils"
 	"net/http"
 	"strconv"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	"gorm.io/gorm"
 )
 
-func GetUserGroup(e *echo.Group) {
+func GetUsersGroup(e *echo.Group) {
 	g := e.Group("/users")
+	g.Use(middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 	g.GET("", getUsers)
 	g.POST("", addUser)
 	g.DELETE("/:id", deleteUserById)
 	g.GET("/:id", getUserById)
 	g.PUT("/:id", replaceUserById)
-	g.GET("/:id/transactions", getUserTransactions)
+}
+
+func GetUserGroup(e *echo.Group) {
+	g := e.Group("/user")
+	g.Use(middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.DELETE("", deleteUserById)
+	g.GET("/transactions", getUserTransactions)
+	g.GET("/payments", getUserPayments)
+	g.GET("/me", getUserData)
+}
+
+func getUserData(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if user == nil {
+		return echo.ErrUnauthorized
+	}
+	claims := user.Claims.(*auth.JwtCustomClaims)
+	userData, err := services.GetUserById(c.Get("db").(*gorm.DB), uint64(claims.ID))
+	if err != nil {
+		return echo.ErrNotFound
+	}
+	return c.JSON(http.StatusOK, models.ConverUserToUserData(userData))
 }
 
 func getUserTransactions(c echo.Context) error {
-	return c.JSON(http.StatusOK, models.Transaction{})
+	return c.JSON(http.StatusOK, []models.Transaction{})
+}
+
+func getUserPayments(c echo.Context) error {
+	return c.JSON(http.StatusOK, []models.Payment{})
 }
 
 func getUsers(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if user == nil {
+		return echo.ErrUnauthorized
+	}
+	claims := user.Claims.(*auth.JwtCustomClaims)
+	if claims.Admin == false {
+		return echo.ErrUnauthorized
+	}
 	users, err := services.GetUsers(c.Get("db").(*gorm.DB))
 	if err != nil {
 		return err
@@ -38,14 +76,31 @@ func addUser(c echo.Context) error {
 	if err := utils.BindAndValidateObject(c, user); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if err := services.AddUser(c.Get("db").(*gorm.DB), *user); err != nil {
+	userToken := c.Get("user").(*jwt.Token)
+	if userToken == nil {
+		user.Admin = false
+	}
+	claims := userToken.Claims.(*auth.JwtCustomClaims)
+	if claims.Admin == false {
+		user.Admin = false
+	}
+	_, err := services.AddUser(c.Get("db").(*gorm.DB), *user)
+	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusCreated, models.UserData{Name: user.Username, Email: user.Email})
+	return c.NoContent(http.StatusCreated)
 }
 
 func getUserById(c echo.Context) error {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	userToken := c.Get("user").(*jwt.Token)
+	if userToken == nil {
+		return echo.ErrUnauthorized
+	}
+	claims := userToken.Claims.(*auth.JwtCustomClaims)
+	if claims.Admin == false || claims.ID != uint(id) {
+		return echo.ErrUnauthorized
+	}
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -61,6 +116,14 @@ func deleteUserById(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	userToken := c.Get("user").(*jwt.Token)
+	if userToken == nil {
+		return echo.ErrUnauthorized
+	}
+	claims := userToken.Claims.(*auth.JwtCustomClaims)
+	if claims.Admin == false || claims.ID != uint(id) {
+		return echo.ErrUnauthorized
+	}
 	if err := services.DeleteUserById(c.Get("db").(*gorm.DB), id); err != nil {
 		return err
 	}
@@ -68,6 +131,14 @@ func deleteUserById(c echo.Context) error {
 }
 
 func replaceUserById(c echo.Context) error {
+	userToken := c.Get("user").(*jwt.Token)
+	if userToken == nil {
+		return echo.ErrUnauthorized
+	}
+	claims := userToken.Claims.(*auth.JwtCustomClaims)
+	if claims.Admin == false {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())

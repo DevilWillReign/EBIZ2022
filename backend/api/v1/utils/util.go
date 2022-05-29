@@ -65,3 +65,7 @@ func RandStringBytes(n int) string {
 	}
 	return string(b)
 }
+
+func GetTokenCookie(token string) *http.Cookie {
+	return &http.Cookie{Name: "userinfo", Value: token, SameSite: http.SameSiteStrictMode, HttpOnly: true, Secure: true, Path: "/"}
+}

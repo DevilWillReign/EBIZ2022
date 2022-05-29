@@ -31,7 +31,7 @@ func DeleteUserById(db *gorm.DB, id uint64) error {
 	return DeleteEntityById(db, id, &userDTO)
 }
 
-func AddUser(db *gorm.DB, userDTO dtos.UserDTO) error {
+func AddUser(db *gorm.DB, userDTO dtos.UserDTO) (dtos.UserDTO, error) {
 	salt := make([]byte, 10)
 	rand.Read(salt)
 	userDTO.Salt = salt

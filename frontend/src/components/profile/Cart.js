@@ -40,7 +40,7 @@ const Cart = () => {
                                 })
                             }
                         </ol>
-                        <button id="cart-pay" className="btn btn-primary" onClick={(e) => buyForProducts(e)}>Pay</button>
+                        <button id="cart-pay" className="btn btn-primary" onClick={() => buyForProducts()}>Pay</button>
                     </>
                 ) 
             }

@@ -11,8 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
+	"golang.org/x/oauth2/gitlab"
 	"golang.org/x/oauth2/google"
-	"golang.org/x/oauth2/slack"
 )
 
 type GithubEmailData struct {
@@ -28,7 +28,9 @@ const oauthGithubUrlAPI = "https://api.github.com/user"
 
 const oauthGithubEmailUrlAPI = "https://api.github.com/user/emails"
 
-const oauthSlackUrlAPI = "https://api.github.com/user"
+const oauthGitlabUrlAPI = "https://gitlab.example.com/api/v4/user"
+
+const oauthGitlabEmailUrlAPI = "https://gitlab.example.com/api/v4/user/emails"
 
 func createCallbackUrl(provider string) string {
 	return "http://" + utils.GetEnv("HOST", "localhost") + ":" + utils.GetEnv("PORT", "9000") + "/api/v1/auths/" + provider + "/callback"
@@ -38,7 +40,7 @@ func GetAuthConfig(provider string) *oauth2.Config {
 	switch provider {
 	case "google":
 		return &oauth2.Config{
-			RedirectURL:  createCallbackUrl("google"),
+			RedirectURL:  createCallbackUrl(provider),
 			ClientID:     utils.GetEnv("GOOGLE_OAUTH_CLIENT_ID", ""),
 			ClientSecret: utils.GetEnv("GOOGLE_OAUTH_CLIENT_SECRET", ""),
 			Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
@@ -46,19 +48,19 @@ func GetAuthConfig(provider string) *oauth2.Config {
 		}
 	case "github":
 		return &oauth2.Config{
-			RedirectURL:  createCallbackUrl("github"),
+			RedirectURL:  createCallbackUrl(provider),
 			ClientID:     utils.GetEnv("GITHUB_OAUTH_CLIENT_ID", ""),
 			ClientSecret: utils.GetEnv("GITHUB_OAUTH_CLIENT_SECRET", ""),
 			Scopes:       []string{"user:email", "read:user"},
 			Endpoint:     github.Endpoint,
 		}
-	case "slack":
+	case "gitlab":
 		return &oauth2.Config{
-			RedirectURL:  createCallbackUrl("slack"),
-			ClientID:     utils.GetEnv("SLACK_OAUTH_CLIENT_ID", ""),
-			ClientSecret: utils.GetEnv("SLACK_OAUTH_CLIENT_SECRET", ""),
-			Scopes:       []string{"users:read.email", "users:read"},
-			Endpoint:     slack.Endpoint,
+			RedirectURL:  createCallbackUrl(provider),
+			ClientID:     utils.GetEnv("GITLAB_OAUTH_CLIENT_ID", ""),
+			ClientSecret: utils.GetEnv("GITLAB_OAUTH_CLIENT_SECRET", ""),
+			Scopes:       []string{"read_user", "profile", "email"},
+			Endpoint:     gitlab.Endpoint,
 		}
 	}
 	return nil
@@ -66,6 +68,7 @@ func GetAuthConfig(provider string) *oauth2.Config {
 
 func getUserDataClient(provider string, token *oauth2.Token) (*http.Request, *http.Request) {
 	var req *http.Request
+	var reqEmail *http.Request
 	switch provider {
 	case "google":
 		req, _ = http.NewRequest("GET", oauthGoogleUrlAPI, nil)
@@ -74,13 +77,15 @@ func getUserDataClient(provider string, token *oauth2.Token) (*http.Request, *ht
 	case "github":
 		req, _ = http.NewRequest("GET", oauthGithubUrlAPI, nil)
 		req.Header.Set("Authorization", token.TokenType+" "+token.AccessToken)
-		reqEmail, _ := http.NewRequest("GET", oauthGithubEmailUrlAPI, nil)
+		reqEmail, _ = http.NewRequest("GET", oauthGithubEmailUrlAPI, nil)
 		reqEmail.Header.Set("Authorization", token.TokenType+" "+token.AccessToken)
 		return req, reqEmail
-	case "slack":
-		req, _ = http.NewRequest("GET", oauthSlackUrlAPI, nil)
+	case "gitlab":
+		req, _ = http.NewRequest("GET", oauthGitlabUrlAPI, nil)
 		req.Header.Set("Authorization", token.TokenType+" "+token.AccessToken)
-		return req, nil
+		reqEmail, _ = http.NewRequest("GET", oauthGitlabEmailUrlAPI, nil)
+		reqEmail.Header.Set("Authorization", token.TokenType+" "+token.AccessToken)
+		return req, reqEmail
 	}
 	return nil, nil
 }

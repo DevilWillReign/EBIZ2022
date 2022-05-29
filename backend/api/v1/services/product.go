@@ -38,12 +38,12 @@ func DeleteProductById(db *gorm.DB, id uint64) error {
 	return nil
 }
 
-func AddProduct(db *gorm.DB, product models.Product) error {
-	err := daos.AddProduct(db, copyProductDTOProperties(product))
+func AddProduct(db *gorm.DB, product models.Product) (models.Product, error) {
+	productDTO, err := daos.AddProduct(db, copyProductDTOProperties(product))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return models.Product{}, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return nil
+	return copyProductProperties(productDTO), nil
 }
 
 func ReplaceProduct(db *gorm.DB, id uint64, product models.Product) error {
