@@ -20,6 +20,25 @@ func GetCategoryGroup(e *echo.Group) {
 	g.DELETE("/:id", deleteCategoryById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 	g.GET("/:id", getCategoryById)
 	g.PUT("/:id", replaceCategoryById, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
+	g.GET("/:id/extended", getCategoryExtended)
+}
+
+func getCategoryExtended(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	db := c.Get("db").(*gorm.DB)
+	category, err := services.GetCategoryById(db, id)
+	if err != nil {
+		return err
+	}
+	products, err := services.GetProductsByCategoryId(db, uint64(category.ID))
+	if err != nil {
+		return err
+	}
+	category.Products = products
+	return c.JSON(http.StatusOK, category)
 }
 
 func getCategories(c echo.Context) error {

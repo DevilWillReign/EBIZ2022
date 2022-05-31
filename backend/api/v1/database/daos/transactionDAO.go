@@ -29,6 +29,14 @@ func ReplaceTransaction(db *gorm.DB, id uint64, transactionDTO dtos.TransactionD
 	if _, err := GetTransactionById(db, id); err != nil {
 		return err
 	}
-	newValues := map[string]interface{}{"userdtoid": transactionDTO.UserDTOID}
+	newValues := map[string]interface{}{"total": transactionDTO.Total, "user_dto_id": transactionDTO.UserDTOID}
 	return ReplaceEntity(db, id, newValues, &dtos.TransactionDTO{})
+}
+
+func GetTransactionsByUserId(db *gorm.DB, userdtoid uint64) ([]dtos.TransactionDTO, error) {
+	var transactions []dtos.TransactionDTO
+	if err := db.Where("user_dto_id = ?", userdtoid).Find(&transactions).Error; err != nil {
+		return []dtos.TransactionDTO{}, nil
+	}
+	return transactions, nil
 }

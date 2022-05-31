@@ -5,7 +5,7 @@ type User struct {
 	Username string `json:"username" validate:"required"`
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
-	Admin    bool   `json:"admin" validate:"required"`
+	Admin    bool   `json:"admin"`
 }
 
 type UserData struct {

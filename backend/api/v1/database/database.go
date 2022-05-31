@@ -6,7 +6,6 @@ import (
 	mathrand "math/rand"
 
 	"github.com/shopspring/decimal"
-	"golang.org/x/crypto/argon2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -46,15 +45,19 @@ func InitializeDatabaseData(db *gorm.DB) {
 	productPrice, _ := decimal.NewFromString("1000000.05")
 	salt := make([]byte, 10)
 	rand.Read(salt)
-	key := argon2.IDKey([]byte("admin@example.com1234"), salt, 3, 32*1024, 4, 32)
-	db.Create(&dtos.UserDTO{Username: "adminin", Email: "admin@example.com", Password: string(key), Salt: salt, Admin: true})
+	key := utils.HashPassword([]byte("admin@example.com1234"), salt)
+	db.Create(&dtos.UserDTO{Username: "adminin", Email: "admin@example.com", Password: key, Salt: salt, Admin: true})
+	totalProducts := 1
 	for i := 1; i <= 5; i++ {
 		num := fmt.Sprint(i)
 		addCategoryIfNotExists(db, "Category"+num)
-		addProductIfNotExists(db, "P"+num, "Product"+num, productPrice)
+		for p := 1; p <= mathrand.Intn(10)+10; p++ {
+			totalProductsSting := fmt.Sprint(totalProducts)
+			addProductIfNotExists(db, "P"+totalProductsSting, "Product"+totalProductsSting, productPrice, uint(i))
+			totalProducts++
+		}
 		addUserIfNotExists(db, "user"+num, "user"+num+"@example.com")
 		addAuthIfNotExists(db, dtos.AuthType(i), uint(i))
-		addTransactionIfNotExists(db, uint(i), uint(i))
 		total := decimal.NewFromInt(0)
 		for j := 1; j <= 5; j++ {
 			quantity := mathrand.Intn(32)
@@ -62,7 +65,8 @@ func InitializeDatabaseData(db *gorm.DB) {
 			addQuantifiedProductIfNotExists(db, uint(j), uint(quantity), uint(i))
 			total = total.Add(productPrice.Mul(quantityD))
 		}
-		addPaymentIfNotExists(db, uint(i), total)
+		addTransactionIfNotExists(db, uint(i), uint(i), total)
+		addPaymentIfNotExists(db, uint(i), dtos.PaymentType(i))
 	}
 }
 
@@ -77,7 +81,7 @@ func addCategoryIfNotExists(db *gorm.DB, name string) {
 	}
 }
 
-func addProductIfNotExists(db *gorm.DB, code string, name string, price decimal.Decimal) {
+func addProductIfNotExists(db *gorm.DB, code string, name string, price decimal.Decimal, categoryId uint) {
 	c := new(dtos.ProductDTO)
 	err := db.Where("code = ?", code).Take(&c)
 	if err.RowsAffected == 0 {
@@ -87,7 +91,7 @@ func addProductIfNotExists(db *gorm.DB, code string, name string, price decimal.
 			Price:         price,
 			Availability:  uint(mathrand.Int63n(64)),
 			Description:   utils.RandStringBytes(20),
-			CategoryDTOID: 1,
+			CategoryDTOID: categoryId,
 		})
 	}
 }
@@ -98,8 +102,8 @@ func addUserIfNotExists(db *gorm.DB, username string, email string) {
 	if err.RowsAffected == 0 {
 		salt := make([]byte, 10)
 		rand.Read(salt)
-		key := argon2.IDKey([]byte(username+email), salt, 3, 32*1024, 4, 32)
-		db.Create(&dtos.UserDTO{Username: username, Email: email, Password: string(key), Salt: salt})
+		key := utils.HashPassword([]byte(username+email), salt)
+		db.Create(&dtos.UserDTO{Username: username, Email: email, Password: key, Salt: salt})
 	}
 }
 
@@ -111,11 +115,11 @@ func addAuthIfNotExists(db *gorm.DB, auth dtos.AuthType, userDTOID uint) {
 	}
 }
 
-func addTransactionIfNotExists(db *gorm.DB, id uint, userDTOID uint) {
+func addTransactionIfNotExists(db *gorm.DB, id uint, userDTOID uint, total decimal.Decimal) {
 	c := new(dtos.TransactionDTO)
 	err := db.Where("id = ?", id).Take(&c)
 	if err.RowsAffected == 0 {
-		db.Create(&dtos.TransactionDTO{UserDTOID: userDTOID})
+		db.Create(&dtos.TransactionDTO{UserDTOID: userDTOID, Total: total})
 	}
 }
 
@@ -127,10 +131,10 @@ func addQuantifiedProductIfNotExists(db *gorm.DB, productDTOID uint, quantity ui
 	}
 }
 
-func addPaymentIfNotExists(db *gorm.DB, transactiondtoid uint, total decimal.Decimal) {
+func addPaymentIfNotExists(db *gorm.DB, transactiondtoid uint, paymentType dtos.PaymentType) {
 	c := new(dtos.PaymentDTO)
 	err := db.Where("transactiondtoid = ?", transactiondtoid).Take(&c)
 	if err.RowsAffected == 0 {
-		db.Create(&dtos.PaymentDTO{TransactionDTOID: transactiondtoid, Total: total})
+		db.Create(&dtos.PaymentDTO{TransactionDTOID: transactiondtoid, PaymentType: paymentType})
 	}
 }

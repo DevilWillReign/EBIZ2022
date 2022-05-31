@@ -48,11 +48,36 @@ func getUserData(c echo.Context) error {
 }
 
 func getUserTransactions(c echo.Context) error {
-	return c.JSON(http.StatusOK, []models.Transaction{})
+	user := c.Get("user").(*jwt.Token)
+	if user == nil {
+		return echo.ErrUnauthorized
+	}
+	claims := user.Claims.(*auth.JwtCustomClaims)
+	transactions, err := services.GetUserTransactions(c.Get("db").(*gorm.DB), uint64(claims.ID))
+	if err != nil {
+		return echo.ErrNotFound
+	}
+	return c.JSON(http.StatusOK, transactions)
 }
 
 func getUserPayments(c echo.Context) error {
-	return c.JSON(http.StatusOK, []models.Payment{})
+	user := c.Get("user").(*jwt.Token)
+	if user == nil {
+		return echo.ErrUnauthorized
+	}
+	claims := user.Claims.(*auth.JwtCustomClaims)
+	transactions, err := services.GetUserTransactions(c.Get("db").(*gorm.DB), uint64(claims.ID))
+	if err != nil {
+		return echo.ErrNotFound
+	}
+	var payments []models.Payment
+	for _, transaction := range transactions {
+		payment, err := services.GetPaymentByTransactionId(c.Get("db").(*gorm.DB), uint64(transaction.ID))
+		if err == nil {
+			payments = append(payments, payment)
+		}
+	}
+	return c.JSON(http.StatusOK, payments)
 }
 
 func getUsers(c echo.Context) error {

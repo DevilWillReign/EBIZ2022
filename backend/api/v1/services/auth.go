@@ -4,11 +4,11 @@ import (
 	"apprit/store/api/v1/database/daos"
 	"apprit/store/api/v1/database/dtos"
 	"apprit/store/api/v1/models"
+	"apprit/store/api/v1/utils"
 	"crypto/subtle"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/argon2"
 	"gorm.io/gorm"
 )
 
@@ -17,8 +17,8 @@ func LoginWithUser(db *gorm.DB, user models.UserLogin) (models.UserData, error) 
 	if err != nil {
 		return models.UserData{}, echo.ErrNotFound
 	}
-	passwordHash := argon2.IDKey([]byte(user.Password), userFromDB.Salt, 3, 32*1024, 4, 32)
-	if subtle.ConstantTimeCompare(passwordHash, []byte(userFromDB.Password)) == 0 {
+	passwordHash := utils.HashPassword([]byte(user.Password), userFromDB.Salt)
+	if subtle.ConstantTimeCompare(passwordHash, userFromDB.Password) == 0 {
 		return models.UserData{}, echo.ErrBadRequest
 	}
 	return models.ConverUserToUserData(copyUserProperties(userFromDB)), nil

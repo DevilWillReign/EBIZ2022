@@ -7,6 +7,6 @@ type UserDTO struct {
 	Username string `gorm:"unique;not null"`
 	Email    string `gorm:"unique;not null"`
 	Admin    bool   `gorm:"not null"`
-	Password string
+	Password []byte
 	Salt     []byte
 }

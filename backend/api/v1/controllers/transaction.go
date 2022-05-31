@@ -21,6 +21,30 @@ func GetTransactionGroup(e *echo.Group) {
 	g.DELETE("/:id", deleteTransactionById)
 	g.GET("/:id", getTransactionById)
 	g.PUT("/:id", replaceTransactionById)
+	g.GET("/:id/extended", getTransactionExtended)
+}
+
+func getTransactionExtended(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	db := c.Get("db").(*gorm.DB)
+	transaction, err := services.GetTransactionById(db, id)
+	if err != nil {
+		return err
+	}
+	payment, err := services.GetPaymentByTransactionId(db, uint64(transaction.ID))
+	if err != nil {
+		return err
+	}
+	quantifiedProducts, err := services.GetQuantifiedProductByTransactionId(db, uint64(transaction.ID))
+	if err != nil {
+		return err
+	}
+	transaction.Payment = payment
+	transaction.QuantifiedProducts = quantifiedProducts
+	return c.JSON(http.StatusOK, transaction)
 }
 
 func getTransactions(c echo.Context) error {

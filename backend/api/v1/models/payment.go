@@ -1,13 +1,15 @@
 package models
 
-import "github.com/shopspring/decimal"
+import (
+	"apprit/store/api/v1/database/dtos"
+)
 
 type Payment struct {
-	ID            uint            `json:"id"`
-	Total         decimal.Decimal `json:"total" validate:"required"`
-	TransactionID uint            `json:"transactionid" validate:"required"`
+	ID            uint             `json:"id"`
+	PaymentType   dtos.PaymentType `json:"paymenttype" validate:"required"`
+	TransactionID uint             `json:"transactionid" validate:"required"`
 }
 
 func (p *Payment) Equals(o Payment) bool {
-	return p.Total == o.Total && p.TransactionID == o.TransactionID
+	return p.TransactionID == o.TransactionID
 }

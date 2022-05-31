@@ -29,6 +29,7 @@ func GetAuthGroup(e *echo.Group) {
 	g.GET("/:provider/login", authWithOAuth)
 	g.GET("/:provider/callback", authWithOAuthCallback)
 	g.POST("/login", authLogin)
+	g.POST("/register", authRegister)
 	g.GET("/logout", authLogout, middleware.JWTWithConfig(auth.GetCustomClaimsConfig()))
 	g.POST("/token", authTokenLocal)
 }
@@ -52,7 +53,7 @@ func authTokenLocal(c echo.Context) error {
 }
 
 func authLogout(c echo.Context) error {
-	c.SetCookie(&http.Cookie{Name: "userinfo", Value: "", HttpOnly: true, Secure: true, SameSite: http.SameSiteStrictMode, Expires: time.Unix(0, 0), Path: "/"})
+	c.SetCookie(&http.Cookie{Name: "userinfo", Value: "", HttpOnly: true, SameSite: http.SameSiteStrictMode, Expires: time.Unix(0, 0), Path: "/"})
 	return c.NoContent(http.StatusOK)
 }
 
@@ -76,6 +77,29 @@ func authLogin(c echo.Context) error {
 	c.SetCookie(utils.GetTokenCookie(t))
 	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success"})
 	return c.NoContent(http.StatusOK)
+}
+
+func authRegister(c echo.Context) error {
+	user := new(models.User)
+	if err := utils.BindAndValidateObject(c, user); err != nil {
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	user.Admin = false
+	userData, err := services.AddUser(c.Get("db").(*gorm.DB), *user)
+	if err != nil {
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		return err
+	}
+
+	t, err := auth.CreateToken(models.ConverUserToUserData(userData))
+	if err != nil {
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	c.SetCookie(utils.GetTokenCookie(t))
+	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success"})
+	return c.NoContent(http.StatusCreated)
 }
 
 func authWithOAuth(c echo.Context) error {

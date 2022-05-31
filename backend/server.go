@@ -29,6 +29,9 @@ func main() {
 	Echo initialization
 	*/
 	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:9001"},

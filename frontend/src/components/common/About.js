@@ -1,14 +1,14 @@
 const About = () => {
     return (
-        <div class="accordion" id="about">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        <div className="accordion" id="about">
+            <div className="accordion-item">
+                <h2 className="accordion-header" id="headingOne">
+                    <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                         Accordion Item #1
                     </button>
                 </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
+                <div id="collapseOne" className="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div className="accordion-body">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Etiam efficitur metus sed nisl viverra, et condimentum arcu varius.
                         Maecenas sodales elementum justo. Nulla eleifend convallis ipsum eget aliquam.
@@ -21,14 +21,14 @@ const About = () => {
                     </div>
                 </div>
             </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            <div className="accordion-item">
+                <h2 className="accordion-header" id="headingTwo">
+                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                         Accordion Item #2
                     </button>
                 </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
+                <div id="collapseTwo" className="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                    <div className="accordion-body">
                         Etiam mattis sed diam et commodo.
                         Suspendisse mauris enim, sollicitudin nec dictum sit amet, sodales sed nibh.
                         Phasellus rhoncus mauris a volutpat porttitor.
@@ -48,14 +48,14 @@ const About = () => {
                     </div>
                 </div>
             </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingThree">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            <div className="accordion-item">
+                <h2 className="accordion-header" id="headingThree">
+                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                         Accordion Item #3
                     </button>
                 </h2>
-                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
+                <div id="collapseThree" className="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                    <div className="accordion-body">
                         Morbi id risus dui.
                         Donec et odio sit amet lacus porta aliquet vitae sit amet erat.
                         Proin viverra semper ipsum, in cursus nibh interdum et.
@@ -72,14 +72,14 @@ const About = () => {
                     </div>
                 </div>
             </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingFour">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            <div className="accordion-item">
+                <h2 className="accordion-header" id="headingFour">
+                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                         Accordion Item #4
                     </button>
                 </h2>
-                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
+                <div id="collapseFour" className="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                    <div className="accordion-body">
                         Aliquam erat volutpat.
                         Cras laoreet, nisl quis molestie bibendum, lorem enim imperdiet mi, eget accumsan sem dui pellentesque sem.
                         Vivamus gravida eget velit sit amet placerat.
@@ -95,14 +95,14 @@ const About = () => {
                     </div>
                 </div>
             </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingFive">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            <div className="accordion-item">
+                <h2 className="accordion-header" id="headingFive">
+                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                         Accordion Item #5
                     </button>
                 </h2>
-                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
+                <div id="collapseFive" className="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                    <div className="accordion-body">
                         In in sapien vitae felis tincidunt fermentum.
                         Vestibulum feugiat, erat ac lobortis gravida, erat sem feugiat sapien, a cursus turpis metus eget enim.
                         Nulla facilisi.

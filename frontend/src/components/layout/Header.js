@@ -1,35 +1,32 @@
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
+import { API } from "../../util/api"
+import Dropdown from "./Dropdown"
+import Link from "./Link"
 
-const routes = (loggedIn) => [
-    {
-        path: "/",
-        name: "Home"
-    },
-    {
-        path: "/profile/cart",
-        name: "Cart"
-    },
-    {
-        path: "/products",
-        name: "Products"
-    },
-    {
-        path: loggedIn ? "/profile" : "/auth",
-        name: loggedIn ? "Profile" : "Login"
-    },
-    {
-        path: loggedIn ? "/auth/logout" : "/auth/register",
-        name: loggedIn ? "Logout" : "Register"
-    },
-]
+const routes = (loggedIn, categories) => {
+    return (
+        <>
+            <Link path={"/"} name={"Home"} />
+            <Link path={"/profile/cart"} name={"Cart"} />
+            <Dropdown path={"/categories"} name={"Categories"} elements={categories} />
+            <Link path={"/products"} name={"Products"} />
+            <Link path={loggedIn ? "/profile" : "/auth"} name={loggedIn ? "Profile" : "Login"} />
+            <Link path={loggedIn ? "/auth/logout" : "/auth/register"} name={loggedIn ? "Logout" : "Register"} />
+        </>
+    )
+}
 
 const Header = () => {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem("userinfo") !== null)
+    const [categories, setCategories] = useState([])
 
     useEffect(() => {
         setLoggedIn(localStorage.getItem("userinfo") !== null)
-    })
+        API.get("/categories").then(response => {
+            setCategories([...response.data])
+        }).catch(() => {})
+    }, [localStorage.getItem("userinfo")])
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -42,13 +39,7 @@ const Header = () => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         {
-                            routes(loggedIn).map(route => {
-                                return (
-                                    <li key={route.path} className="nav-item">
-                                        <NavLink className="nav-link active" aria-current="page" to={route.path}>{route.name}</NavLink>
-                                    </li>
-                                )
-                            })
+                            routes(loggedIn, categories)
                         }
                     </ul>
                 </div>

@@ -63,9 +63,9 @@ func ReplaceUser(db *gorm.DB, id uint64, user models.User) error {
 }
 
 func copyUserProperties(userDTO dtos.UserDTO) models.User {
-	return models.User{ID: userDTO.ID, Username: userDTO.Username, Admin: userDTO.Admin, Email: userDTO.Email, Password: userDTO.Password}
+	return models.User{ID: userDTO.ID, Username: userDTO.Username, Admin: userDTO.Admin, Email: userDTO.Email, Password: string(userDTO.Password)}
 }
 
 func copyUserDTOProperties(user models.User) dtos.UserDTO {
-	return dtos.UserDTO{Username: user.Username, Email: user.Email, Admin: user.Admin, Password: user.Password}
+	return dtos.UserDTO{Username: user.Username, Email: user.Email, Admin: user.Admin, Password: []byte(user.Password)}
 }

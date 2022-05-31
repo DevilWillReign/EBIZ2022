@@ -54,10 +54,18 @@ func ReplacePayment(db *gorm.DB, id uint64, payment models.Payment) error {
 	return nil
 }
 
+func GetPaymentByTransactionId(db *gorm.DB, transactionid uint64) (models.Payment, error) {
+	paymentDTO, err := daos.GetPaymentByTransactionId(db, transactionid)
+	if err != nil {
+		return models.Payment{}, nil
+	}
+	return copyPaymentProperties(paymentDTO), nil
+}
+
 func copyPaymentProperties(paymentDTO dtos.PaymentDTO) models.Payment {
-	return models.Payment{ID: paymentDTO.ID, Total: paymentDTO.Total, TransactionID: paymentDTO.TransactionDTOID}
+	return models.Payment{ID: paymentDTO.ID, PaymentType: paymentDTO.PaymentType, TransactionID: paymentDTO.TransactionDTOID}
 }
 
 func copyPaymentDTOProperties(payment models.Payment) dtos.PaymentDTO {
-	return dtos.PaymentDTO{Total: payment.Total, TransactionDTOID: payment.TransactionID}
+	return dtos.PaymentDTO{PaymentType: payment.PaymentType, TransactionDTOID: payment.TransactionID}
 }

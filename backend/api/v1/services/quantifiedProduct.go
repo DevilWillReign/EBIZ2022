@@ -57,6 +57,19 @@ func ReplaceQuantifiedProduct(db *gorm.DB, id uint64, quantifiedProduct models.Q
 	return nil
 }
 
+func GetQuantifiedProductByTransactionId(db *gorm.DB, transactionId uint64) ([]models.QuantifiedProduct, error) {
+	quantifiedProductDTOs, err := daos.GetQuantifiedProductsByTransactionId(db, transactionId)
+	if err != nil {
+		return []models.QuantifiedProduct{}, nil
+	}
+	var quantifiedProducts []models.QuantifiedProduct
+	for _, quantifiedProductDTO := range quantifiedProductDTOs {
+		productDTO, _ := daos.GetProductById(db, uint64(quantifiedProductDTO.ProductDTOID))
+		quantifiedProducts = append(quantifiedProducts, copyQuantifiedProductProperties(quantifiedProductDTO, productDTO))
+	}
+	return quantifiedProducts, nil
+}
+
 func copyQuantifiedProductProperties(quantifiedProductDTO dtos.QuantifiedProductDTO, productDTO dtos.ProductDTO) models.QuantifiedProduct {
 	return models.QuantifiedProduct{ID: productDTO.ID, Name: productDTO.Name, Code: productDTO.Code, Price: productDTO.Price, CategoryID: productDTO.CategoryDTOID, Quantity: quantifiedProductDTO.Quantity, TransactionID: quantifiedProductDTO.TransactionDTOID}
 }

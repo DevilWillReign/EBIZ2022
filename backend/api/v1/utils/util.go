@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/argon2"
 )
 
 type CustomValidator struct {
@@ -67,5 +68,9 @@ func RandStringBytes(n int) string {
 }
 
 func GetTokenCookie(token string) *http.Cookie {
-	return &http.Cookie{Name: "userinfo", Value: token, SameSite: http.SameSiteStrictMode, HttpOnly: true, Secure: true, Path: "/"}
+	return &http.Cookie{Name: "userinfo", Value: token, HttpOnly: true, SameSite: http.SameSiteStrictMode, Path: "/"}
+}
+
+func HashPassword(password []byte, salt []byte) []byte {
+	return argon2.IDKey(password, salt, 3, 32*1024, 4, 32)
 }

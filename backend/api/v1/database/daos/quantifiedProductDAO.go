@@ -29,7 +29,15 @@ func ReplaceQuantifiedProduct(db *gorm.DB, id uint64, quantifiedProductDTO dtos.
 	if _, err := GetQuantifiedProductById(db, id); err != nil {
 		return err
 	}
-	newValues := map[string]interface{}{"productdtoid": quantifiedProductDTO.ProductDTOID, "quantity": quantifiedProductDTO.Quantity,
-		"transactiondtoid": quantifiedProductDTO.TransactionDTOID}
+	newValues := map[string]interface{}{"product_dto_id": quantifiedProductDTO.ProductDTOID, "quantity": quantifiedProductDTO.Quantity,
+		"transaction_dto_id": quantifiedProductDTO.TransactionDTOID}
 	return ReplaceEntity(db, id, newValues, &dtos.QuantifiedProductDTO{})
+}
+
+func GetQuantifiedProductsByTransactionId(db *gorm.DB, transactionid uint64) ([]dtos.QuantifiedProductDTO, error) {
+	var quantifiedProducts []dtos.QuantifiedProductDTO
+	if err := db.Where("transaction_dto_id=?", transactionid).Find(quantifiedProducts).Error; err != nil {
+		return []dtos.QuantifiedProductDTO{}, err
+	}
+	return quantifiedProducts, nil
 }

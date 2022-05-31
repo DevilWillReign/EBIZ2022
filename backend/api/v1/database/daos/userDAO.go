@@ -2,9 +2,9 @@ package daos
 
 import (
 	"apprit/store/api/v1/database/dtos"
+	"apprit/store/api/v1/utils"
 	"crypto/rand"
 
-	"golang.org/x/crypto/argon2"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +35,7 @@ func AddUser(db *gorm.DB, userDTO dtos.UserDTO) (dtos.UserDTO, error) {
 	salt := make([]byte, 10)
 	rand.Read(salt)
 	userDTO.Salt = salt
-	userDTO.Password = string(argon2.IDKey([]byte(userDTO.Password), salt, 3, 32*1024, 4, 32))
+	userDTO.Password = utils.HashPassword([]byte(userDTO.Password), salt)
 	return AddEntity(db, &userDTO)
 }
 
@@ -46,7 +46,7 @@ func ReplaceUser(db *gorm.DB, id uint64, userDTO dtos.UserDTO) error {
 	salt := make([]byte, 10)
 	rand.Read(salt)
 	userDTO.Salt = salt
-	userDTO.Password = string(argon2.IDKey([]byte(userDTO.Password), salt, 3, 32*1024, 4, 32))
+	userDTO.Password = utils.HashPassword([]byte(userDTO.Password), salt)
 	newValues := map[string]interface{}{"username": userDTO.Username, "password": userDTO.Password, "salt": userDTO.Salt, "email": userDTO.Email}
 	return ReplaceEntity(db, id, newValues, &dtos.UserDTO{})
 }

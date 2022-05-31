@@ -12,11 +12,11 @@ const Profile = () => {
             localStorage.setItem("userinfo", null)
             navigate("/auth/logout", { replace: true })
         }
-        API_PROTECTED.get("/user/me").then((response) => {
+        API_PROTECTED.get("/user/me").then(response => {
             if (response.status === 200) {
                 setProfile(response.data)
             }
-        }).catch(reason => {
+        }).catch(() => {
             navigate("/auth/logout", { replace: true })
         })
     }, [navigate, loggedIn])
@@ -33,8 +33,8 @@ const Profile = () => {
                     <li id="user-email" className="list-group-item">Email: {profile.email}</li>
                 </ul>
                 <NavLink className="btn btn-primary" to="/profile/cart">Cart</NavLink>
+                <NavLink className="btn btn-primary" to="/profile/payments">Payments</NavLink>
                 <NavLink className="btn btn-primary" to="/profile/transactions">Transactions</NavLink>
-                <NavLink className="btn btn-primary" to="/profile/cart">Cart</NavLink>
             </>
         )
     }

@@ -29,6 +29,6 @@ func ReplaceAuth(db *gorm.DB, id uint64, authDTO dtos.AuthDTO) error {
 	if _, err := GetAuthById(db, id); err != nil {
 		return err
 	}
-	newValues := map[string]interface{}{"authtype": authDTO.Authtype, "userdtoid": authDTO.UserDTOID}
+	newValues := map[string]interface{}{"auth_type": authDTO.Authtype, "user_dto_id": authDTO.UserDTOID}
 	return ReplaceEntity(db, id, newValues, &dtos.AuthDTO{})
 }

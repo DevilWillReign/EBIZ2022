@@ -1,14 +1,14 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
 import { useNavigate } from "react-router-dom"
 import * as Yup from "yup"
-import { API } from "../../util/api"
+import { API, API_PROTECTED } from "../../util/api"
 import { useCookies } from "react-cookie"
 import { useState } from "react"
 import './Login.css'
 
 const Register = () => {
     const navigate = useNavigate()
-    const [removeCookies] = useCookies(["login_state"])
+    const [cookies, setCookies, removeCookies] = useCookies(["login_state"])
     const [failed, setFailed] = useState(false)
 
     return (
@@ -24,7 +24,7 @@ const Register = () => {
                     })}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
                         setSubmitting(true);
-                        API.post("/users", values).then((response) => {
+                        API_PROTECTED.post("/auths/register", values).then((response) => {
                             if (response.status === 201) {
                                 localStorage.setItem("userinfo", true)
                                 removeCookies()

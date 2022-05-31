@@ -11,6 +11,9 @@ import Product from "../components/products/Product"
 import Transactions from "../components/profile/Transactions"
 import About from "../components/common/About"
 import Logout from "../components/auth/Logout"
+import Categories from "../components/categories/Categories"
+import Category from "../components/categories/Category"
+import Transaction from "../components/profile/Transaction"
 
 const routes = [
     {
@@ -34,6 +37,20 @@ const routes = [
             {
                 path: ":productId",
                 element: <Product />
+            }
+        ]
+    },
+    {
+        path: "/categories",
+        element: <MainLayout />,
+        children: [
+            {
+                index: true,
+                element: <Categories />
+            },
+            {
+                path: ":categoryId",
+                element: <Category />
             }
         ]
     },
@@ -66,6 +83,10 @@ const routes = [
             {
                 path: "transactions",
                 element: <Transactions />
+            },
+            {
+                path: "transactions/:transactionId",
+                element: <Transaction />
             },
             {
                 path: "cart",

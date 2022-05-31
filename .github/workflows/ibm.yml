@@ -28,15 +28,15 @@ env:
   API_BASE_URL: url
 
   IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
-  IBM_CLOUD_REGION: us-south
+  IBM_CLOUD_REGION: global
 
   ICR_NAMESPACE: ${{ secrets.ICR_NAMESPACE }}
-  REGISTRY_HOSTNAME: us.icr.io
+  REGISTRY_HOSTNAME: icr.io
 
   FRONT_IMAGE_NAME: apprit-front
   API_IMAGE_NAME: apprit-api
 
-  IKS_CLUSTER: example-iks-cluster-name-or-id
+  IKS_CLUSTER: iks-apprit-app
   FRONT_DEPLOYMENT_NAME: apprit-front
   API_DEPLOYMENT_NAME: apprit-api
 

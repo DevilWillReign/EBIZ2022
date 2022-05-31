@@ -1,7 +1,7 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
 import * as Yup from "yup"
 import { useNavigate } from "react-router-dom"
-import { API } from "../../util/api"
+import { API, API_PROTECTED } from "../../util/api"
 import './Login.css'
 import { useCookies } from "react-cookie"
 import { useEffect, useState } from "react"
@@ -28,14 +28,14 @@ const Login = () => {
         <div className="text-center">
             <div className="form-signin">
                 <Formik
-                    initialValues={{username: '', password: ''}}
+                    initialValues={{email: '', password: ''}}
                     validationSchema={Yup.object({
-                        username: Yup.string().required("Required"),
+                        email: Yup.string().email().required("Required"),
                         password: Yup.string().required("Required")
                     })}
                     onSubmit={(values, { setSubmitting }) => {
                         setSubmitting(true);
-                        API.post("/auths/login", values).then((response) => {
+                        API_PROTECTED.post("/auths/login", values).then((response) => {
                             if (response.status === 200) {
                                 localStorage.setItem("userinfo", true)
                                 removeCookies()
@@ -64,9 +64,9 @@ const Login = () => {
                                 onSubmit={handleSubmit}
                             >
                                 <div className="mb-1">
-                                    <label htmlFor="username" className="form-label">Username</label>
-                                    <Field name="username" type="text" value={values.username} className="form-control" />
-                                    <div className={touched.username && errors.username ? "alert alert-danger" : null}><ErrorMessage name="username" /></div>
+                                    <label htmlFor="email" className="form-label">Email</label>
+                                    <Field name="email" type="text" value={values.email} className="form-control" />
+                                    <div className={touched.email && errors.email ? "alert alert-danger" : null}><ErrorMessage name="email" /></div>
                                 </div>
                                 <div className="mb-1">
                                     <label htmlFor="password" className="form-label">Password</label>
@@ -81,7 +81,7 @@ const Login = () => {
                 <hr />
                 <div>
                     <a className="btn btn-lg btn-secondary w-100 mb-1" href={api_url + "/auths/google/login?redirect_url=" + location} >Google Login</a>
-                    <a className="btn btn-lg btn-secondary w-100" href={api_url + "/auths/github/login?redirect_url=" + location}>Github Login</a>
+                    <a className="btn btn-lg btn-secondary w-100 mb-1" href={api_url + "/auths/github/login?redirect_url=" + location}>Github Login</a>
                     <a className="btn btn-lg btn-secondary w-100" href={api_url + "/auths/gitlab/login?redirect_url=" + location}>Gitlab Login</a>
                 </div>
             </div>

@@ -54,10 +54,22 @@ func ReplaceTransaction(db *gorm.DB, id uint64, transaction models.Transaction) 
 	return nil
 }
 
+func GetUserTransactions(db *gorm.DB, id uint64) ([]models.Transaction, error) {
+	transactionDTOs, err := daos.GetTransactionsByUserId(db, id)
+	if err != nil {
+		return []models.Transaction{}, nil
+	}
+	var transactions []models.Transaction
+	for _, transactionDTO := range transactionDTOs {
+		transactions = append(transactions, copyTransactionProperties(transactionDTO))
+	}
+	return transactions, nil
+}
+
 func copyTransactionProperties(transactionDTO dtos.TransactionDTO) models.Transaction {
-	return models.Transaction{ID: transactionDTO.ID, UserID: transactionDTO.UserDTOID, CreatedAt: transactionDTO.CreatedAt}
+	return models.Transaction{ID: transactionDTO.ID, UserID: transactionDTO.UserDTOID, CreatedAt: transactionDTO.CreatedAt, Total: transactionDTO.Total}
 }
 
 func copyTransactionDTOProperties(transaction models.Transaction) dtos.TransactionDTO {
-	return dtos.TransactionDTO{UserDTOID: transaction.UserID}
+	return dtos.TransactionDTO{UserDTOID: transaction.UserID, Total: transaction.Total}
 }

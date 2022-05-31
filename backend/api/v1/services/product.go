@@ -13,7 +13,7 @@ import (
 func GetProducts(db *gorm.DB) ([]models.Product, error) {
 	productDTOs, err := daos.GetProducts(db)
 	if err != nil {
-		return []models.Product{}, nil
+		return []models.Product{}, echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	var products []models.Product
 	for _, productDTO := range productDTOs {
@@ -52,6 +52,18 @@ func ReplaceProduct(db *gorm.DB, id uint64, product models.Product) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	return nil
+}
+
+func GetProductsByCategoryId(db *gorm.DB, id uint64) ([]models.Product, error) {
+	productDTOs, err := daos.GetProductsByCategoryId(db, id)
+	if err != nil {
+		return []models.Product{}, echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	var products []models.Product
+	for _, productDTO := range productDTOs {
+		products = append(products, copyProductProperties(productDTO))
+	}
+	return products, nil
 }
 
 func copyProductProperties(productDTO dtos.ProductDTO) models.Product {

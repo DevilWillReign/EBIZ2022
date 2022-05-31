@@ -29,7 +29,15 @@ func ReplaceProduct(db *gorm.DB, id uint64, productDTO dtos.ProductDTO) error {
 	if _, err := GetProductById(db, id); err != nil {
 		return err
 	}
-	newValues := map[string]interface{}{"code": productDTO.Code, "categorydtoid": productDTO.CategoryDTOID,
+	newValues := map[string]interface{}{"code": productDTO.Code, "category_dto_id": productDTO.CategoryDTOID,
 		"name": productDTO.Name, "price": productDTO.Price}
 	return ReplaceEntity(db, id, newValues, &dtos.ProductDTO{})
+}
+
+func GetProductsByCategoryId(db *gorm.DB, categorydtoid uint64) ([]dtos.ProductDTO, error) {
+	var products []dtos.ProductDTO
+	if err := db.Where("category_dto_id = ?", categorydtoid).Find(&products).Error; err != nil {
+		return []dtos.ProductDTO{}, err
+	}
+	return products, nil
 }

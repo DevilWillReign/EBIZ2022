@@ -29,6 +29,14 @@ func ReplacePayment(db *gorm.DB, id uint64, paymentDTO dtos.PaymentDTO) error {
 	if _, err := GetPaymentById(db, id); err != nil {
 		return err
 	}
-	newValues := map[string]interface{}{"total": paymentDTO.Total, "transactiondtoid": paymentDTO.TransactionDTOID}
+	newValues := map[string]interface{}{"payment_type": paymentDTO.PaymentType, "transaction_dto_id": paymentDTO.TransactionDTOID}
 	return ReplaceEntity(db, id, newValues, &dtos.PaymentDTO{})
+}
+
+func GetPaymentByTransactionId(db *gorm.DB, transactiondtoid uint64) (dtos.PaymentDTO, error) {
+	var paymentDTO dtos.PaymentDTO
+	if err := db.Where("transaction_dto_id = ?", transactiondtoid).First(&paymentDTO).Error; err != nil {
+		return dtos.PaymentDTO{}, err
+	}
+	return paymentDTO, nil
 }
