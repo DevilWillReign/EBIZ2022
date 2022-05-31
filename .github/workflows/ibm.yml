@@ -28,10 +28,10 @@ env:
   API_BASE_URL: url
 
   IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
-  IBM_CLOUD_REGION: global
+  IBM_CLOUD_REGION: uk-south
 
   ICR_NAMESPACE: ${{ secrets.ICR_NAMESPACE }}
-  REGISTRY_HOSTNAME: icr.io
+  REGISTRY_HOSTNAME: uk.icr.io
 
   FRONT_IMAGE_NAME: apprit-front
   API_IMAGE_NAME: apprit-api
