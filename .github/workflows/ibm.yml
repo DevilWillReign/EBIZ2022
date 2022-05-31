@@ -28,7 +28,8 @@ env:
   API_BASE_URL: url
 
   IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
-  IBM_CLOUD_REGION: uk-south
+  IBM_CLOUD_REGION: eu-gb
+  IBM_CR_REGION: uk-south
 
   ICR_NAMESPACE: ${{ secrets.ICR_NAMESPACE }}
   REGISTRY_HOSTNAME: uk.icr.io
@@ -63,7 +64,7 @@ jobs:
     - name: Authenticate with IBM Cloud CLI
       run: |
         ibmcloud login --apikey "${IBM_CLOUD_API_KEY}" -r "${IBM_CLOUD_REGION}" -g Default
-        ibmcloud cr region-set "${IBM_CLOUD_REGION}"
+        ibmcloud cr region-set "${IBM_CR_REGION}"
         ibmcloud cr login
 
     # Build the Docker images
