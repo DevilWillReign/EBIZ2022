@@ -1,7 +1,7 @@
 import { Formik, Field, Form, ErrorMessage } from "formik"
 import { useNavigate } from "react-router-dom"
 import * as Yup from "yup"
-import { API, API_PROTECTED } from "../../util/api"
+import { API_PROTECTED } from "../../util/api"
 import { useCookies } from "react-cookie"
 import { useState } from "react"
 import './Login.css'
@@ -20,7 +20,7 @@ const Register = () => {
                         username: Yup.string().required("Required"),
                         email: Yup.string().email().required("Required"),
                         password: Yup.string().required("Required"),
-                        repeat_password: Yup.string().oneOf([Yup.ref("password"), null], "Password must match.")
+                        repeat_password: Yup.string().oneOf([Yup.ref("password"), null], "Passwords must match.")
                     })}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
                         setSubmitting(true);

@@ -20,13 +20,14 @@ const routes = (loggedIn, categories) => {
 const Header = () => {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem("userinfo") !== null)
     const [categories, setCategories] = useState([])
+    const checkLocalStorage = () => localStorage.getItem("userinfo")
 
     useEffect(() => {
         setLoggedIn(localStorage.getItem("userinfo") !== null)
         API.get("/categories").then(response => {
             setCategories([...response.data])
         }).catch(() => {})
-    }, [localStorage.getItem("userinfo")])
+    }, [checkLocalStorage])
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">

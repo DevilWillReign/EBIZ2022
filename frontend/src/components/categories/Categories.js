@@ -17,7 +17,7 @@ const Categories = () => {
                 categories.map(category => {
                     return (
                         <div key={category.name} className="card">
-                            <img className="card-img-top" src="..." alt="Card image cap" />
+                            <img className="card-img-top" src="..." alt={category.name} />
                             <div className="card-body">
                                 <h5 className="card-title">{category.name}</h5>
                                 <p className="card-text">{category.description}</p>
