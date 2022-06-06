@@ -56,7 +56,7 @@ jobs:
       with:
         build-args: |
           API_PORT=${{ env.API_PORT }}
-          FRONT_HOST: ${{ env.FRONT_HOST }}
+          FRONT_HOST=${{ env.FRONT_HOST }}
           SESSION_SECRET=${{ env.SESSION_SECRET }}
           JWT_SECRET=${{ env.JWT_SECRET }}
           GOOGLE_OAUTH_CLIENT_ID=${{ env.GOOGLE_OAUTH_CLIENT_ID }}
