@@ -57,6 +57,14 @@ jobs:
         build-args: |
           API_PORT=${{ env.API_PORT }}
           FRONT_HOST: ${{ env.FRONT_HOST }}
+          SESSION_SECRET=${{ env.SESSION_SECRET }}
+          JWT_SECRET=${{ env.JWT_SECRET }}
+          GOOGLE_OAUTH_CLIENT_ID=${{ env.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET=${{ env.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GH_OAUTH_CLIENT_ID=${{ env.GH_OAUTH_CLIENT_ID }}
+          GH_OAUTH_CLIENT_SECRET=${{ env.GH_OAUTH_CLIENT_SECRET }}
+          GL_OAUTH_CLIENT_ID=${{ env.GL_OAUTH_CLIENT_ID }}
+          GL_OAUTH_CLIENT_SECRET=${{ env.GL_OAUTH_CLIENT_SECRET }}
         context: ./backend
         push: true
         tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritback:${{ github.sha }}
