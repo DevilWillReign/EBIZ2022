@@ -17,6 +17,7 @@ WORKDIR /home/appuser
 
 COPY . .
 EXPOSE 9001
+RUN go mod tidy
 RUN go build -o appritstoreback
 
 CMD [ "appritstoreback" ]
