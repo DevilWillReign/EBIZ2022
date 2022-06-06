@@ -17,5 +17,6 @@ WORKDIR /home/appuser
 
 COPY . .
 EXPOSE 9001
+RUN go build -o appritstoreback
 
-CMD [ "go", "run", "server.go" ]
+CMD [ "appritstoreback" ]
