@@ -4,11 +4,13 @@ RUN useradd -m -s /bin/bash appuser
 USER appuser
 WORKDIR /home/appuser
 
-COPY . .
-RUN go mod download
-RUN go build -o appritstoreback
+COPY go.mod ./
+COPY go.sum ./
 
-EXPOSE 80
-EXPOSE 9001
+RUN go mod download
+
+COPY . .
+
+RUN go build -o appritstoreback
 
 CMD [ "appritstoreback" ]
