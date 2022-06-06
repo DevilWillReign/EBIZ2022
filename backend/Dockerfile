@@ -1,6 +1,6 @@
 FROM golang:1.18-alpine
 
-RUN adduser -s /bin/bash appuser
+RUN addgroup -S appgroup && adduser -G appgroup -S appuser
 USER appuser
 WORKDIR /home/appuser
 
