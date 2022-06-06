@@ -1,6 +1,6 @@
 FROM golang:1.18-buster
 
-RUN addgroup -S appgroup && adduser -G appgroup -S appuser
+RUN useradd -m -s /bin/bash appuser
 USER appuser
 WORKDIR /home/appuser
 
