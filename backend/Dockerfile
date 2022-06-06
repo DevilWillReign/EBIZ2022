@@ -1,4 +1,4 @@
-FROM golang:1.18-alpine
+FROM golang:1.18-buster
 
 RUN addgroup -S appgroup && adduser -G appgroup -S appuser
 USER appuser
