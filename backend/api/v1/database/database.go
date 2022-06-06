@@ -6,7 +6,7 @@ import (
 	mathrand "math/rand"
 
 	"github.com/shopspring/decimal"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
 	"apprit/store/api/v1/database/dtos"
@@ -14,18 +14,19 @@ import (
 )
 
 func CreateDatabase() *gorm.DB {
-	databaseUser := utils.GetEnv("DATABASE_USER", "")
-	databasePassword := utils.GetEnv("DATABASE_PASS", "")
-	databaseAddress := utils.GetEnv("DATABASE_ADDRESS", "")
-	databasePort := utils.GetEnv("DATABASE_PORT", "")
+	// databaseUser := utils.GetEnv("DATABASE_USER", "")
+	// databasePassword := utils.GetEnv("DATABASE_PASS", "")
+	// databaseAddress := utils.GetEnv("DATABASE_ADDRESS", "")
+	// databasePort := utils.GetEnv("DATABASE_PORT", "")
 	databaseName := utils.GetEnv("DATABASE_NAME", "test")
-	dsn := ""
-	if databasePassword == "" {
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", databaseUser, databasePassword, databaseAddress, databasePort, databaseName)
-	} else {
-		dsn = fmt.Sprintf("%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", databaseUser, databaseAddress, databasePort, databaseName)
-	}
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// dsn := ""
+	// if databasePassword == "" {
+	// 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", databaseUser, databasePassword, databaseAddress, databasePort, databaseName)
+	// } else {
+	// 	dsn = fmt.Sprintf("%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", databaseUser, databaseAddress, databasePort, databaseName)
+	// }
+	// mysql.Open(dsn)
+	db, err := gorm.Open(sqlite.Open(databaseName), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
