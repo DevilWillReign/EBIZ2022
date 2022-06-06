@@ -1,6 +1,6 @@
 FROM golang:1.18-alpine
 
-RUN useradd -m -s /bin/bash appuser
+RUN adduser -s /bin/bash appuser
 USER appuser
 WORKDIR /home/appuser
 

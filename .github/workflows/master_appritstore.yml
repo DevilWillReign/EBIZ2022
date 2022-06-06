@@ -9,6 +9,19 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  API_PORT: 80
+  PORT: 80
+  API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+  GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+  GH_OAUTH_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
+  GH_OAUTH_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
+  GL_OAUTH_CLIENT_ID: ${{ secrets.GL_OAUTH_CLIENT_ID }}
+  GL_OAUTH_CLIENT_SECRET: ${{ secrets.GL_OAUTH_CLIENT_SECRET }}
+
 jobs:
   build:
     runs-on: 'ubuntu-latest'

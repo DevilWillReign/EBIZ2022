@@ -34,7 +34,7 @@ func main() {
 
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:9001"},
+		AllowOrigins:     []string{utils.GetEnv("FRONT_HOST", "http://localhost:9001")},
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowCredentials: true,
 	}))
@@ -59,5 +59,5 @@ func main() {
 	controllers.GetTransactionGroup(api)
 	controllers.GetUsersGroup(api)
 	controllers.GetUserGroup(api)
-	e.Logger.Fatal(e.Start(utils.GetEnv("HOST", "") + ":" + utils.GetEnv("PORT", "9000")))
+	e.Logger.Fatal(e.Start(utils.GetEnv("API_HOST", "") + ":" + utils.GetEnv("API_PORT", "9000")))
 }

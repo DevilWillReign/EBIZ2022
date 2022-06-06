@@ -49,16 +49,16 @@ func GetAuthConfig(provider string) *oauth2.Config {
 	case "github":
 		return &oauth2.Config{
 			RedirectURL:  createCallbackUrl(provider),
-			ClientID:     utils.GetEnv("GITHUB_OAUTH_CLIENT_ID", ""),
-			ClientSecret: utils.GetEnv("GITHUB_OAUTH_CLIENT_SECRET", ""),
+			ClientID:     utils.GetEnv("GH_OAUTH_CLIENT_ID", ""),
+			ClientSecret: utils.GetEnv("GH_OAUTH_CLIENT_SECRET", ""),
 			Scopes:       []string{"user:email", "read:user"},
 			Endpoint:     github.Endpoint,
 		}
 	case "gitlab":
 		return &oauth2.Config{
 			RedirectURL:  createCallbackUrl(provider),
-			ClientID:     utils.GetEnv("GITLAB_OAUTH_CLIENT_ID", ""),
-			ClientSecret: utils.GetEnv("GITLAB_OAUTH_CLIENT_SECRET", ""),
+			ClientID:     utils.GetEnv("GL_OAUTH_CLIENT_ID", ""),
+			ClientSecret: utils.GetEnv("GL_OAUTH_CLIENT_SECRET", ""),
 			Scopes:       []string{"read_user", "profile", "email"},
 			Endpoint:     gitlab.Endpoint,
 		}
