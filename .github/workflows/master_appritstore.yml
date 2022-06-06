@@ -65,5 +65,5 @@ jobs:
       with:
         app-name: 'appritback'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_ef29c38d3ed44935a31269c2ad25437d }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_Back }}
         images: 'apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritback:${{ github.sha }}'
