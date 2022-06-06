@@ -10,7 +10,7 @@ ENV GOROOT /usr/local/go
 ENV PATH $PATH:$GOROOT/bin
 RUN go version
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOROOT)/bin v1.44.2
-RUN golangci-lint --version
+
 RUN useradd -m -s /bin/bash appuser
 USER appuser
 WORKDIR /home/appuser
