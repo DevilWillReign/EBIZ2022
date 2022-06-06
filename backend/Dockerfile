@@ -8,6 +8,7 @@ COPY . .
 RUN go mod download
 RUN go build -o appritstoreback
 
+EXPOSE 80
 EXPOSE 9001
 
 CMD [ "appritstoreback" ]

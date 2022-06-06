@@ -13,6 +13,7 @@ ENV PORT 9000
 COPY . .
 
 # Specify port
+EXPOSE 80
 EXPOSE 9000
 
 # start app
