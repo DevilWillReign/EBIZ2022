@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritstore:${{ github.sha }}
-        file: ./Dockerfile
+        file: ./frontend/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
