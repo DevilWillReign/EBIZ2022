@@ -1,17 +1,22 @@
+version: "3.9"
 services:
   front:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-dev
     ports:
       - "9001:9001"
     depends_on:
       - api
     environment:
       - PORT=9001
-      - API_BASE_URL=http://backend/api/v1
+      - REACT_APP_API_BASE_URL=http://backend/api/v1
     links:
       - "api:backend"
   api:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-dev
     ports:
       - "9000:9000"
     depends_on:

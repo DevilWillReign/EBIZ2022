@@ -1,11 +1,5 @@
 FROM node:16
 
-ARG ARG_API_BASE_URL=http://localhost:9000/api/v1
-ARG ARG_FRONT_PORT=9001
-
-ENV PORT $ARG_FRONT_PORT
-ENV REACT_APP_API_BASE_URL $ARG_API_BASE_URL
-
 WORKDIR /usr/src/app
 
 # install and cache app dependencies
@@ -16,7 +10,7 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-EXPOSE ${PORT}
+EXPOSE 9001
 
 # start app
 CMD ["npm", "start"]
