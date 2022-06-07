@@ -12,7 +12,7 @@ const Payments = () => {
             localStorage.setItem("userinfo", null)
             navigate("/auth/logout", { replace: true })
         }
-        API_PROTECTED.get("/user/payments").then(response => {
+        API_PROTECTED().get("/user/payments").then(response => {
             if (response.status === 200) {
                 setPayments(response.data)
             }

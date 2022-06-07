@@ -24,7 +24,7 @@ const Register = () => {
                     })}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
                         setSubmitting(true);
-                        API_PROTECTED.post("/auths/register", values).then((response) => {
+                        API_PROTECTED().post("/auths/register", values).then((response) => {
                             if (response.status === 201) {
                                 localStorage.setItem("userinfo", true)
                                 removeCookies()

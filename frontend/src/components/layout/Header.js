@@ -24,7 +24,7 @@ const Header = () => {
 
     useEffect(() => {
         setLoggedIn(localStorage.getItem("userinfo") !== null)
-        API.get("/categories").then(response => {
+        API().get("/categories").then(response => {
             setCategories([...response.data])
         }).catch(() => {})
     }, [checkLocalStorage])

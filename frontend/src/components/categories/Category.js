@@ -7,7 +7,7 @@ const Category = () => {
     const { categoryId } = useParams()
 
     useEffect(() => {
-        API.get("/categories/" + categoryId + "/extended").then((response) => {
+        API().get("/categories/" + categoryId + "/extended").then((response) => {
             if (response.status === 200) {
                 setCategory(response.data)
             }

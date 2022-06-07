@@ -6,7 +6,7 @@ const Categories = () => {
     const [categories, setCategories] = useState([])
 
     useEffect(() => {
-        API.get("/categories").then(response => {
+        API().get("/categories").then(response => {
             setCategories([...response.data])
         }).catch(() => {})
     }, [])

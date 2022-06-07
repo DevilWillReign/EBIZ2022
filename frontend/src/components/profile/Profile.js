@@ -12,7 +12,7 @@ const Profile = () => {
             localStorage.setItem("userinfo", null)
             navigate("/auth/logout", { replace: true })
         }
-        API_PROTECTED.get("/user/me").then(response => {
+        API_PROTECTED().get("/user/me").then(response => {
             if (response.status === 200) {
                 setProfile(response.data)
             }

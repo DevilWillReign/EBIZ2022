@@ -12,7 +12,7 @@ const Transactions = () => {
             localStorage.setItem("userinfo", null)
             navigate("/auth/logout", { replace: true })
         }
-        API_PROTECTED.get("/user/transactions").then(response => {
+        API_PROTECTED().get("/user/transactions").then(response => {
             setTransactions([...response.data])
         }).catch(() => {
             navigate("/auth/logout", { replace: true })

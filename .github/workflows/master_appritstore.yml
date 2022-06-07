@@ -12,7 +12,6 @@ on:
 env:
   API_PORT: ${{ secrets.API_PORT }}
   FRONT_PORT: 80
-  API_HOST: ${{ secrets.API_HOST }}
   FRONT_HOST: ${{ secrets.FRONT_HOST }}
   API_BASE_URL: ${{ secrets.API_BASE_URL }}
   SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
@@ -57,7 +56,6 @@ jobs:
       with:
         build-args: |
           ARG_API_PORT=${{ env.API_PORT }}
-          ARG_API_HOST=${{ env.API_HOST }}
           ARG_FRONT_HOST=${{ env.FRONT_HOST }}
           ARG_SESSION_SECRET=${{ env.SESSION_SECRET }}
           ARG_JWT_SECRET=${{ env.JWT_SECRET }}

@@ -7,7 +7,7 @@ import { useCookies } from "react-cookie"
 import { useEffect, useState } from "react"
 
 const Login = () => {
-    const api_url = API.defaults.baseURL
+    const api_url = API().defaults.baseURL
     const location = "/auth"
     const navigate = useNavigate()
     const [cookies, setCookies, removeCookies] = useCookies(["login_state"])
@@ -35,7 +35,7 @@ const Login = () => {
                     })}
                     onSubmit={(values, { setSubmitting }) => {
                         setSubmitting(true);
-                        API_PROTECTED.post("/auths/login", values).then((response) => {
+                        API_PROTECTED().post("/auths/login", values).then((response) => {
                             if (response.status === 200) {
                                 localStorage.setItem("userinfo", true)
                                 removeCookies()
