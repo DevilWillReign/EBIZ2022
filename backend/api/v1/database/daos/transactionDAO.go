@@ -7,17 +7,17 @@ import (
 )
 
 func GetTransactions(db *gorm.DB) ([]dtos.TransactionDTO, error) {
-	var transactions []dtos.TransactionDTO
+	transactions := []dtos.TransactionDTO{}
 	return GetEntities(db, &transactions)
 }
 
 func GetTransactionById(db *gorm.DB, id uint64) (dtos.TransactionDTO, error) {
-	var transactionDTO dtos.TransactionDTO
+	transactionDTO := dtos.TransactionDTO{}
 	return GetEntityById(db, id, &transactionDTO)
 }
 
 func DeleteTransactionById(db *gorm.DB, id uint64) error {
-	var transactionDTO dtos.TransactionDTO
+	transactionDTO := dtos.TransactionDTO{}
 	return DeleteEntityById(db, id, &transactionDTO)
 }
 
@@ -34,9 +34,17 @@ func ReplaceTransaction(db *gorm.DB, id uint64, transactionDTO dtos.TransactionD
 }
 
 func GetTransactionsByUserId(db *gorm.DB, userdtoid uint64) ([]dtos.TransactionDTO, error) {
-	var transactions []dtos.TransactionDTO
-	if err := db.Where("user_dto_id = ?", userdtoid).Find(&transactions).Error; err != nil {
+	transactions := []dtos.TransactionDTO{}
+	if err := db.Where("user_dto_id = ?", userdtoid).Order("created_at DESC").Find(&transactions).Error; err != nil {
 		return []dtos.TransactionDTO{}, nil
 	}
 	return transactions, nil
+}
+
+func GetUserTransactionById(db *gorm.DB, userdtoid uint64, id uint64) (dtos.TransactionDTO, error) {
+	transactionDTO := dtos.TransactionDTO{}
+	if err := db.Where("id = ? AND user_dto_id = ?", id, userdtoid).First(&transactionDTO).Error; err != nil {
+		return dtos.TransactionDTO{}, nil
+	}
+	return transactionDTO, nil
 }

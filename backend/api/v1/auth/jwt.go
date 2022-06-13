@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
@@ -40,4 +41,22 @@ func CreateToken(userData models.UserData) (string, error) {
 		return "", err
 	}
 	return t, nil
+}
+
+func IsNotAdmin(c echo.Context) bool {
+	userToken := c.Get("user").(*jwt.Token)
+	if userToken == nil {
+		return true
+	}
+	claims := userToken.Claims.(*JwtCustomClaims)
+	return !claims.Admin
+}
+
+func IsNotAdminAndSameUser(c echo.Context, id uint64) bool {
+	userToken := c.Get("user").(*jwt.Token)
+	if userToken == nil {
+		return true
+	}
+	claims := userToken.Claims.(*JwtCustomClaims)
+	return !claims.Admin && claims.ID != uint(id)
 }

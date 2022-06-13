@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { API_PROTECTED } from "../../util/api"
 
 const Profile = () => {
-    const [loggedIn] = useState(localStorage.getItem("userinfo") !== null)
+    const [loggedIn, ] = useState(localStorage.getItem("userinfo") !== null)
     const navigate = useNavigate()
     const [profile, setProfile] = useState(null)
 
@@ -12,7 +12,7 @@ const Profile = () => {
             localStorage.setItem("userinfo", null)
             navigate("/auth/logout", { replace: true })
         }
-        API_PROTECTED().get("/user/me").then(response => {
+        API_PROTECTED.get("/user/me").then(response => {
             if (response.status === 200) {
                 setProfile(response.data)
             }
@@ -32,9 +32,9 @@ const Profile = () => {
                     <li id="user-name" className="list-group-item">Name: {profile.name}</li>
                     <li id="user-email" className="list-group-item">Email: {profile.email}</li>
                 </ul>
-                <NavLink className="btn btn-primary" to="/profile/cart">Cart</NavLink>
-                <NavLink className="btn btn-primary" to="/profile/payments">Payments</NavLink>
-                <NavLink className="btn btn-primary" to="/profile/transactions">Transactions</NavLink>
+                <NavLink id="user-cart" className="btn btn-primary" to="/profile/cart">Cart</NavLink>
+                <NavLink id="user-payments" className="btn btn-primary" to="/profile/payments">Payments</NavLink>
+                <NavLink id="user-transactions" className="btn btn-primary" to="/profile/transactions">Transactions</NavLink>
             </>
         )
     }

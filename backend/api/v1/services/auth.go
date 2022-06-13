@@ -29,7 +29,7 @@ func GetAuths(db *gorm.DB) ([]models.Auth, error) {
 	if err != nil {
 		return []models.Auth{}, nil
 	}
-	var auths []models.Auth
+	auths := []models.Auth{}
 	for _, authDTO := range authDTOs {
 		auths = append(auths, copyAuthProperties(authDTO))
 	}

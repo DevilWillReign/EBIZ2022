@@ -15,7 +15,7 @@ func GetPayments(db *gorm.DB) ([]models.Payment, error) {
 	if err != nil {
 		return []models.Payment{}, nil
 	}
-	var payments []models.Payment
+	payments := []models.Payment{}
 	for _, paymentDTO := range paymentDTOs {
 		payments = append(payments, copyPaymentProperties(paymentDTO))
 	}
@@ -58,6 +58,17 @@ func GetPaymentByTransactionId(db *gorm.DB, transactionid uint64) (models.Paymen
 	paymentDTO, err := daos.GetPaymentByTransactionId(db, transactionid)
 	if err != nil {
 		return models.Payment{}, nil
+	}
+	return copyPaymentProperties(paymentDTO), nil
+}
+
+func GetUserPaymentById(db *gorm.DB, userId uint64, transactionid uint64, id uint64) (models.Payment, error) {
+	if _, err := GetUserTransactionById(db, userId, transactionid); err != nil {
+		return models.Payment{}, echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	paymentDTO, err := daos.GetUserPaymentById(db, transactionid, id)
+	if err != nil {
+		return models.Payment{}, echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return copyPaymentProperties(paymentDTO), nil
 }

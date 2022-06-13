@@ -24,25 +24,34 @@ func GetPaymentGroup(e *echo.Group) {
 }
 
 func getPayments(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	payments, err := services.GetPayments(c.Get("db").(*gorm.DB))
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, payments)
+	return c.JSON(http.StatusOK, models.ResponseArrayEntity[models.Payment]{Elements: payments})
 }
 
 func addPayment(c echo.Context) error {
-	payment := new(models.Payment)
-	if err := utils.BindAndValidateObject(c, payment); err != nil {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
+	payment := models.Payment{}
+	if err := utils.BindAndValidateObject(c, &payment); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if _, err := services.AddPayment(c.Get("db").(*gorm.DB), *payment); err != nil {
+	if _, err := services.AddPayment(c.Get("db").(*gorm.DB), payment); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
 }
 
 func getPaymentById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -55,6 +64,9 @@ func getPaymentById(c echo.Context) error {
 }
 
 func deletePaymentById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -66,12 +78,15 @@ func deletePaymentById(c echo.Context) error {
 }
 
 func replacePaymentById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	db := c.Get("db").(*gorm.DB)
-	var payment models.Payment
+	payment := models.Payment{}
 	if err := utils.BindAndValidateObject(c, &payment); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

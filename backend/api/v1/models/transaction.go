@@ -11,6 +11,21 @@ type Transaction struct {
 	CreatedAt          time.Time           `json:"createdat"`
 	UserID             uint                `json:"userid" validate:"required"`
 	Total              decimal.Decimal     `json:"total" validate:"required"`
-	Payment            Payment             `json:"payments"`
+	Payment            Payment             `json:"payment"`
 	QuantifiedProducts []QuantifiedProduct `json:"quantifiedproducts"`
+}
+
+type PostTransaction struct {
+	ID        uint            `json:"id"`
+	CreatedAt time.Time       `json:"createdat"`
+	UserID    uint            `json:"userid" validate:"required"`
+	Total     decimal.Decimal `json:"total" validate:"required"`
+}
+
+type UserTransaction struct {
+	ID                 uint                `json:"id"`
+	CreatedAt          time.Time           `json:"createdat"`
+	UserID             uint                `json:"userid" validate:"required"`
+	Total              decimal.Decimal     `json:"total" validate:"required"`
+	QuantifiedProducts []QuantifiedProduct `json:"quantifiedproducts" validate:"required"`
 }

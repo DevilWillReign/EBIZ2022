@@ -8,5 +8,5 @@ type CategoryDTO struct {
 	gorm.Model
 	Name        string `gorm:"unique;not null"`
 	Description string
-	Product     []ProductDTO
+	Product     []ProductDTO `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

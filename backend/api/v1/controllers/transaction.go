@@ -21,10 +21,13 @@ func GetTransactionGroup(e *echo.Group) {
 	g.DELETE("/:id", deleteTransactionById)
 	g.GET("/:id", getTransactionById)
 	g.PUT("/:id", replaceTransactionById)
-	g.GET("/:id/extended", getTransactionExtended)
+	g.GET("/:id/extended", getExtendedTransactionById)
 }
 
-func getTransactionExtended(c echo.Context) error {
+func getExtendedTransactionById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -48,25 +51,34 @@ func getTransactionExtended(c echo.Context) error {
 }
 
 func getTransactions(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	transactions, err := services.GetTransactions(c.Get("db").(*gorm.DB))
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, transactions)
+	return c.JSON(http.StatusOK, models.ResponseArrayEntity[models.Transaction]{Elements: transactions})
 }
 
 func addTransaction(c echo.Context) error {
-	transaction := new(models.Transaction)
-	if err := utils.BindAndValidateObject(c, transaction); err != nil {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
+	transaction := models.PostTransaction{}
+	if err := utils.BindAndValidateObject(c, &transaction); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if _, err := services.AddTransaction(c.Get("db").(*gorm.DB), *transaction); err != nil {
+	if _, err := services.AddTransaction(c.Get("db").(*gorm.DB), transaction); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
 }
 
 func getTransactionById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -79,6 +91,9 @@ func getTransactionById(c echo.Context) error {
 }
 
 func deleteTransactionById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -90,12 +105,15 @@ func deleteTransactionById(c echo.Context) error {
 }
 
 func replaceTransactionById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	db := c.Get("db").(*gorm.DB)
-	var transaction models.Transaction
+	transaction := models.Transaction{}
 	if err := utils.BindAndValidateObject(c, &transaction); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

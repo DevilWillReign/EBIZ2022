@@ -4,6 +4,7 @@ import (
 	"apprit/store/api/v1/database/daos"
 	"apprit/store/api/v1/database/dtos"
 	"apprit/store/api/v1/models"
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -15,7 +16,7 @@ func GetQuantifiedProducts(db *gorm.DB) ([]models.QuantifiedProduct, error) {
 	if err != nil {
 		return []models.QuantifiedProduct{}, nil
 	}
-	var quantifiedProducts []models.QuantifiedProduct
+	quantifiedProducts := []models.QuantifiedProduct{}
 	for _, quantifiedProductDTO := range quantifiedProductDTOs {
 		productDTO, _ := daos.GetProductById(db, uint64(quantifiedProductDTO.ProductDTOID))
 		quantifiedProducts = append(quantifiedProducts, copyQuantifiedProductProperties(quantifiedProductDTO, productDTO))
@@ -49,6 +50,18 @@ func AddQuantifiedProduct(db *gorm.DB, quantifiedProduct models.QuantifiedProduc
 	return copyQuantifiedProductProperties(quantifiedProductDTO, productDTO), nil
 }
 
+func AddAllQuantifiedProduct(db *gorm.DB, quantifiedProducts []models.QuantifiedProduct) error {
+	quantifiedProductDTOs := []dtos.QuantifiedProductDTO{}
+	for _, quantifiedProduct := range quantifiedProducts {
+		_, err := daos.GetProductByCode(db, quantifiedProduct.Code)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		quantifiedProductDTOs = append(quantifiedProductDTOs, copyQuantifiedProductDTOProperties(quantifiedProduct))
+	}
+	return daos.AddAllQuantifiedProduct(db, quantifiedProductDTOs)
+}
+
 func ReplaceQuantifiedProduct(db *gorm.DB, id uint64, quantifiedProduct models.QuantifiedProduct) error {
 	err := daos.ReplaceQuantifiedProduct(db, id, copyQuantifiedProductDTOProperties(quantifiedProduct))
 	if err != nil {
@@ -62,7 +75,7 @@ func GetQuantifiedProductByTransactionId(db *gorm.DB, transactionId uint64) ([]m
 	if err != nil {
 		return []models.QuantifiedProduct{}, nil
 	}
-	var quantifiedProducts []models.QuantifiedProduct
+	quantifiedProducts := []models.QuantifiedProduct{}
 	for _, quantifiedProductDTO := range quantifiedProductDTOs {
 		productDTO, _ := daos.GetProductById(db, uint64(quantifiedProductDTO.ProductDTOID))
 		quantifiedProducts = append(quantifiedProducts, copyQuantifiedProductProperties(quantifiedProductDTO, productDTO))

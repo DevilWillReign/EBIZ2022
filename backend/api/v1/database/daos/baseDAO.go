@@ -34,6 +34,13 @@ func AddEntity[E dtos.Entity](db *gorm.DB, entity *E) (E, error) {
 	return *entity, nil
 }
 
+func AddAllEntities[E dtos.Entity](db *gorm.DB, entity *[]E) error {
+	if err := db.Create(entity).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func ReplaceEntity[E dtos.Entity](db *gorm.DB, id uint64, newValues map[string]interface{}, e *E) error {
 	if err := db.Model(e).Select("*").Where("ID = ?", id).Updates(newValues).Error; err != nil {
 		return err

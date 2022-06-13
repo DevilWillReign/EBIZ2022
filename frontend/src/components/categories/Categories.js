@@ -6,22 +6,23 @@ const Categories = () => {
     const [categories, setCategories] = useState([])
 
     useEffect(() => {
-        API().get("/categories").then(response => {
-            setCategories([...response.data])
+        API.get("/categories").then(response => {
+            setCategories([...response.data.elements])
         }).catch(() => {})
     }, [])
 
     return (
-        <div className="card-group">
+        <div id="category-list" className="card-group">
             {
                 categories.map(category => {
+                    const prefix = "category-" + category.name
                     return (
-                        <div key={category.name} className="card">
-                            <img className="card-img-top" src="..." alt={category.name} />
-                            <div className="card-body">
-                                <h5 className="card-title">{category.name}</h5>
-                                <p className="card-text">{category.description}</p>
-                                <NavLink className="btn btn-primary" to={"" + category.id}>Go category</NavLink>
+                        <div id={prefix} key={category.name} className="card">
+                            <img id={prefix + "-img"} className="card-img-top" src="..." alt={category.name} />
+                            <div id={prefix + "-body"} className="card-body">
+                                <h5 id={prefix + "-name"} className="card-title">{category.name}</h5>
+                                <p id={prefix + "-description"} className="card-text">{category.description}</p>
+                                <NavLink className="btn btn-primary" to={"" + category.id}>Go to category</NavLink>
                             </div>
                         </div>
                     )

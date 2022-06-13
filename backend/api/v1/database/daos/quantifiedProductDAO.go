@@ -7,17 +7,17 @@ import (
 )
 
 func GetQuantifiedProducts(db *gorm.DB) ([]dtos.QuantifiedProductDTO, error) {
-	var quantifiedProducts []dtos.QuantifiedProductDTO
+	quantifiedProducts := []dtos.QuantifiedProductDTO{}
 	return GetEntities(db, &quantifiedProducts)
 }
 
 func GetQuantifiedProductById(db *gorm.DB, id uint64) (dtos.QuantifiedProductDTO, error) {
-	var quantifiedProductDTO dtos.QuantifiedProductDTO
+	quantifiedProductDTO := dtos.QuantifiedProductDTO{}
 	return GetEntityById(db, id, &quantifiedProductDTO)
 }
 
 func DeleteQuantifiedProductById(db *gorm.DB, id uint64) error {
-	var quantifiedProductDTO dtos.QuantifiedProductDTO
+	quantifiedProductDTO := dtos.QuantifiedProductDTO{}
 	return DeleteEntityById(db, id, &quantifiedProductDTO)
 }
 
@@ -35,9 +35,13 @@ func ReplaceQuantifiedProduct(db *gorm.DB, id uint64, quantifiedProductDTO dtos.
 }
 
 func GetQuantifiedProductsByTransactionId(db *gorm.DB, transactionid uint64) ([]dtos.QuantifiedProductDTO, error) {
-	var quantifiedProducts []dtos.QuantifiedProductDTO
-	if err := db.Where("transaction_dto_id=?", transactionid).Find(quantifiedProducts).Error; err != nil {
+	quantifiedProducts := []dtos.QuantifiedProductDTO{}
+	if err := db.Where("transaction_dto_id=?", transactionid).Find(&quantifiedProducts).Error; err != nil {
 		return []dtos.QuantifiedProductDTO{}, err
 	}
 	return quantifiedProducts, nil
+}
+
+func AddAllQuantifiedProduct(db *gorm.DB, quantifiedProductDTOs []dtos.QuantifiedProductDTO) error {
+	return AddAllEntities(db, &quantifiedProductDTOs)
 }

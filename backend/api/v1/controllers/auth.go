@@ -180,19 +180,6 @@ func generateStateOauthCookie(c echo.Context) string {
 	return state
 }
 
-// type ErrorDetails struct {
-// 	Error            string `json:"error"`
-// 	ErrorDescription string `json:"error_description"`
-// }
-// if rErr, ok := err.(*oauth2.RetrieveError); ok {
-// 	details := new(ErrorDetails)
-// 	if err := json.Unmarshal(rErr.Body, details); err != nil {
-// 		panic(err)
-// 	}
-
-// 	log.Println(details.Error, details.ErrorDescription)
-// }
-
 func getUserDataFromProvider(code string, oauthConfig *oauth2.Config, provider string) (*models.UserData, error) {
 	token, err := oauthConfig.Exchange(context.Background(), code)
 	if err != nil {
@@ -210,15 +197,18 @@ func getAuths(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, auths)
+	return c.JSON(http.StatusOK, models.ResponseArrayEntity[models.Auth]{Elements: auths})
 }
 
 func addAuth(c echo.Context) error {
-	auth := new(models.Auth)
-	if err := utils.BindAndValidateObject(c, auth); err != nil {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
+	auth := models.Auth{}
+	if err := utils.BindAndValidateObject(c, &auth); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if _, err := services.AddAuth(c.Get("db").(*gorm.DB), *auth); err != nil {
+	if _, err := services.AddAuth(c.Get("db").(*gorm.DB), auth); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
@@ -237,6 +227,9 @@ func getAuthById(c echo.Context) error {
 }
 
 func deleteAuthById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -248,12 +241,15 @@ func deleteAuthById(c echo.Context) error {
 }
 
 func replaceAuthById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	db := c.Get("db").(*gorm.DB)
-	var auth models.Auth
+	auth := models.Auth{}
 	if err := utils.BindAndValidateObject(c, &auth); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

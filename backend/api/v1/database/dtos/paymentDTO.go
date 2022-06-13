@@ -7,7 +7,8 @@ import (
 type PaymentType int
 
 const (
-	Card PaymentType = iota
+	_ PaymentType = iota
+	Card
 	Transfer
 	PayPal
 )

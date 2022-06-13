@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
-import { API } from "../../util/api"
-import Dropdown from "./Dropdown"
+import CategoryDropdown from "../categories/CategoryDropdown"
 import Link from "./Link"
 
-const routes = (loggedIn, categories) => {
+const routes = (loggedIn) => {
     return (
         <>
             <Link path={"/"} name={"Home"} />
             <Link path={"/profile/cart"} name={"Cart"} />
-            <Dropdown path={"/categories"} name={"Categories"} elements={categories} />
+            <CategoryDropdown path={"/categories"} name={"Categories"} />
             <Link path={"/products"} name={"Products"} />
             <Link path={loggedIn ? "/profile" : "/auth"} name={loggedIn ? "Profile" : "Login"} />
             <Link path={loggedIn ? "/auth/logout" : "/auth/register"} name={loggedIn ? "Logout" : "Register"} />
@@ -19,14 +18,10 @@ const routes = (loggedIn, categories) => {
 
 const Header = () => {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem("userinfo") !== null)
-    const [categories, setCategories] = useState([])
     const checkLocalStorage = () => localStorage.getItem("userinfo")
-
+    
     useEffect(() => {
         setLoggedIn(localStorage.getItem("userinfo") !== null)
-        API().get("/categories").then(response => {
-            setCategories([...response.data])
-        }).catch(() => {})
     }, [checkLocalStorage])
 
     return (
@@ -40,7 +35,7 @@ const Header = () => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         {
-                            routes(loggedIn, categories)
+                            routes(loggedIn)
                         }
                     </ul>
                 </div>

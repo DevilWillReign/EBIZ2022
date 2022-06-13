@@ -7,17 +7,25 @@ import (
 )
 
 func GetProducts(db *gorm.DB) ([]dtos.ProductDTO, error) {
-	var products []dtos.ProductDTO
+	products := []dtos.ProductDTO{}
 	return GetEntities(db, &products)
 }
 
 func GetProductById(db *gorm.DB, id uint64) (dtos.ProductDTO, error) {
-	var productDTO dtos.ProductDTO
+	productDTO := dtos.ProductDTO{}
 	return GetEntityById(db, id, &productDTO)
 }
 
+func GetProductByCode(db *gorm.DB, code string) (dtos.ProductDTO, error) {
+	product := dtos.ProductDTO{}
+	if err := db.Where("code = ?", code).First(&product).Error; err != nil {
+		return dtos.ProductDTO{}, err
+	}
+	return product, nil
+}
+
 func DeleteProductById(db *gorm.DB, id uint64) error {
-	var productDTO dtos.ProductDTO
+	productDTO := dtos.ProductDTO{}
 	return DeleteEntityById(db, id, &productDTO)
 }
 
@@ -35,7 +43,7 @@ func ReplaceProduct(db *gorm.DB, id uint64, productDTO dtos.ProductDTO) error {
 }
 
 func GetProductsByCategoryId(db *gorm.DB, categorydtoid uint64) ([]dtos.ProductDTO, error) {
-	var products []dtos.ProductDTO
+	products := []dtos.ProductDTO{}
 	if err := db.Where("category_dto_id = ?", categorydtoid).Find(&products).Error; err != nil {
 		return []dtos.ProductDTO{}, err
 	}

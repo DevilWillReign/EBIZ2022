@@ -7,7 +7,7 @@ const Category = () => {
     const { categoryId } = useParams()
 
     useEffect(() => {
-        API().get("/categories/" + categoryId + "/extended").then((response) => {
+        API.get("/categories/" + categoryId + "/extended").then((response) => {
             if (response.status === 200) {
                 setCategory(response.data)
             }
@@ -29,7 +29,7 @@ const Category = () => {
                                     <li key={"product" + product.id} className="list-group-item">
                                         <span>
                                             <NavLink to={"/products/" + product.id}>
-                                                {"name: "  +product.name + ", price: " + product.price + ", avaliability " + product.availability}
+                                                {"name: "  +product.name + ", price: " + product.price + ", avaliability: " + product.availability}
                                             </NavLink>
                                         </span>
                                     </li>
@@ -39,7 +39,7 @@ const Category = () => {
                     </ul>
                 </li>
             </ul>
-            <NavLink to="/categories" className="btn btn-primary">Back to categories list</NavLink>
+            <NavLink id="category-back" to="/categories" className="btn btn-primary">Back to categories list</NavLink>
         </>
     )
 }

@@ -24,25 +24,34 @@ func GetQuantifiedProductGroup(e *echo.Group) {
 }
 
 func getQuantifiedProducts(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	quantifiedProducts, err := services.GetQuantifiedProducts(c.Get("db").(*gorm.DB))
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, quantifiedProducts)
+	return c.JSON(http.StatusOK, models.ResponseArrayEntity[models.QuantifiedProduct]{Elements: quantifiedProducts})
 }
 
 func addQuantifiedProduct(c echo.Context) error {
-	quantifiedProduct := new(models.QuantifiedProduct)
-	if err := utils.BindAndValidateObject(c, quantifiedProduct); err != nil {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
+	quantifiedProduct := models.QuantifiedProduct{}
+	if err := utils.BindAndValidateObject(c, &quantifiedProduct); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if _, err := services.AddQuantifiedProduct(c.Get("db").(*gorm.DB), *quantifiedProduct); err != nil {
+	if _, err := services.AddQuantifiedProduct(c.Get("db").(*gorm.DB), quantifiedProduct); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
 }
 
 func getQuantifiedProductById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -55,6 +64,9 @@ func getQuantifiedProductById(c echo.Context) error {
 }
 
 func deleteQuantifiedProductById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -66,12 +78,15 @@ func deleteQuantifiedProductById(c echo.Context) error {
 }
 
 func replaceQuantifiedProductById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	db := c.Get("db").(*gorm.DB)
-	var quantifiedProduct models.QuantifiedProduct
+	quantifiedProduct := models.QuantifiedProduct{}
 	if err := utils.BindAndValidateObject(c, &quantifiedProduct); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

@@ -23,7 +23,7 @@ func GetUsers(db *gorm.DB) ([]models.User, error) {
 	if err != nil {
 		return []models.User{}, nil
 	}
-	var users []models.User
+	users := []models.User{}
 	for _, userDTO := range userDTOs {
 		users = append(users, copyUserProperties(userDTO))
 	}

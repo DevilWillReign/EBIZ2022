@@ -9,17 +9,17 @@ import (
 )
 
 func GetUsers(db *gorm.DB) ([]dtos.UserDTO, error) {
-	var users []dtos.UserDTO
+	users := []dtos.UserDTO{}
 	return GetEntities(db, &users)
 }
 
 func GetUserById(db *gorm.DB, id uint64) (dtos.UserDTO, error) {
-	var userDTO dtos.UserDTO
+	userDTO := dtos.UserDTO{}
 	return GetEntityById(db, id, &userDTO)
 }
 
 func GetUserByEmail(db *gorm.DB, email string) (dtos.UserDTO, error) {
-	var userDTO dtos.UserDTO
+	userDTO := dtos.UserDTO{}
 	if err := db.Where("email = ?", email).First(&userDTO).Error; err != nil {
 		return userDTO, err
 	}
@@ -27,7 +27,7 @@ func GetUserByEmail(db *gorm.DB, email string) (dtos.UserDTO, error) {
 }
 
 func DeleteUserById(db *gorm.DB, id uint64) error {
-	var userDTO dtos.UserDTO
+	userDTO := dtos.UserDTO{}
 	return DeleteEntityById(db, id, &userDTO)
 }
 

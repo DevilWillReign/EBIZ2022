@@ -46,15 +46,18 @@ func getCategories(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, categories)
+	return c.JSON(http.StatusOK, models.ResponseArrayEntity[models.Category]{Elements: categories})
 }
 
 func addCategory(c echo.Context) error {
-	category := new(models.Category)
-	if err := utils.BindAndValidateObject(c, category); err != nil {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
+	category := models.PostCategory{}
+	if err := utils.BindAndValidateObject(c, &category); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if _, err := services.AddCategory(c.Get("db").(*gorm.DB), *category); err != nil {
+	if _, err := services.AddCategory(c.Get("db").(*gorm.DB), category); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
@@ -73,6 +76,9 @@ func getCategoryById(c echo.Context) error {
 }
 
 func deleteCategoryById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -84,12 +90,15 @@ func deleteCategoryById(c echo.Context) error {
 }
 
 func replaceCategoryById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	db := c.Get("db").(*gorm.DB)
-	var category models.Category
+	category := models.Category{}
 	if err := utils.BindAndValidateObject(c, &category); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

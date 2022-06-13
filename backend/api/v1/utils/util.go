@@ -2,6 +2,8 @@ package utils
 
 import (
 	"apprit/store/api/v1/models"
+	"encoding/json"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -11,6 +13,7 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/argon2"
+	"golang.org/x/oauth2"
 )
 
 type CustomValidator struct {
@@ -73,4 +76,20 @@ func GetTokenCookie(token string) *http.Cookie {
 
 func HashPassword(password []byte, salt []byte) []byte {
 	return argon2.IDKey(password, salt, 3, 32*1024, 4, 32)
+}
+
+type errorDetails struct {
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
+}
+
+func GetOauthErrorDetails(err error) {
+	if rErr, ok := err.(*oauth2.RetrieveError); ok {
+		details := new(errorDetails)
+		if err := json.Unmarshal(rErr.Body, details); err != nil {
+			log.Println(err)
+		}
+
+		log.Println(details.Error, details.ErrorDescription)
+	}
 }

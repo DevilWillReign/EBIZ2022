@@ -14,6 +14,7 @@ import Logout from "../components/auth/Logout"
 import Categories from "../components/categories/Categories"
 import Category from "../components/categories/Category"
 import Transaction from "../components/profile/Transaction"
+import PayForm from "../components/profile/PayForm"
 
 const routes = [
     {
@@ -95,6 +96,10 @@ const routes = [
             {
                 path: "payments",
                 element: <Payments />
+            },
+            {
+                path: "payments/form/:transactionId",
+                element: <PayForm />
             }
         ]
     },

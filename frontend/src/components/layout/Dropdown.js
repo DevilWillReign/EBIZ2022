@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom"
 
 const Dropdown = (props) => {
     return (
-        <li key={props.path} className="nav-item">
+        <li id={"dropdown-" + props.name} key={props.path} className="nav-item">
             <NavLink type="button" className="btn" to={props.path}>{props.name}</NavLink>
             <button type="button" className="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                 <span className="visually-hidden">Toggle Dropdown</span>
@@ -11,7 +11,7 @@ const Dropdown = (props) => {
                 {
                     props.elements.map(element => {
                         return (
-                            <li key={props.path + "/" + element.id}>
+                            <li id={props.path.replace("/", "").replaceAll("/", "-") + "-" + element.id} key={props.path + "-" + element.id}>
                                 <NavLink className="dropdown-item" to={props.path + "/" + element.id}>{element.name}</NavLink>
                             </li>
                         )

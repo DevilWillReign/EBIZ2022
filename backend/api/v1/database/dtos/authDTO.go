@@ -7,7 +7,8 @@ import (
 type AuthType int
 
 const (
-	Github AuthType = iota
+	_ AuthType = iota
+	Github
 	Google
 	Slack
 )

@@ -27,15 +27,18 @@ func getProducts(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, products)
+	return c.JSON(http.StatusOK, models.ResponseArrayEntity[models.Product]{Elements: products})
 }
 
 func addProduct(c echo.Context) error {
-	product := new(models.Product)
-	if err := utils.BindAndValidateObject(c, product); err != nil {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
+	product := models.Product{}
+	if err := utils.BindAndValidateObject(c, &product); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	if _, err := services.AddProduct(c.Get("db").(*gorm.DB), *product); err != nil {
+	if _, err := services.AddProduct(c.Get("db").(*gorm.DB), product); err != nil {
 		return err
 	}
 	return c.NoContent(http.StatusCreated)
@@ -54,6 +57,9 @@ func getProductById(c echo.Context) error {
 }
 
 func deleteProductById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -65,12 +71,15 @@ func deleteProductById(c echo.Context) error {
 }
 
 func replaceProductById(c echo.Context) error {
+	if auth.IsNotAdmin(c) {
+		return echo.ErrUnauthorized
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	db := c.Get("db").(*gorm.DB)
-	var product models.Product
+	product := models.Product{}
 	if err := utils.BindAndValidateObject(c, &product); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

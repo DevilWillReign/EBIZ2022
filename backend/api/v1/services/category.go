@@ -15,7 +15,7 @@ func GetCategories(db *gorm.DB) ([]models.Category, error) {
 	if err != nil {
 		return []models.Category{}, nil
 	}
-	var categories []models.Category
+	categories := []models.Category{}
 	for _, category := range categoryDTOs {
 		categories = append(categories, copyCategoryProperties(category))
 	}
@@ -38,8 +38,8 @@ func DeleteCategoryById(db *gorm.DB, id uint64) error {
 	return nil
 }
 
-func AddCategory(db *gorm.DB, category models.Category) (models.Category, error) {
-	categoryDTO, err := daos.AddCategory(db, copyCategoryDTOProperties(category))
+func AddCategory(db *gorm.DB, category models.PostCategory) (models.Category, error) {
+	categoryDTO, err := daos.AddCategory(db, copyCategoryDTOPropertiesFromPost(category))
 	if err != nil {
 		return models.Category{}, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -63,6 +63,13 @@ func copyCategoryProperties(categoryDTO dtos.CategoryDTO) models.Category {
 }
 
 func copyCategoryDTOProperties(category models.Category) dtos.CategoryDTO {
+	return dtos.CategoryDTO{
+		Name:        category.Name,
+		Description: category.Description,
+	}
+}
+
+func copyCategoryDTOPropertiesFromPost(category models.PostCategory) dtos.CategoryDTO {
 	return dtos.CategoryDTO{
 		Name:        category.Name,
 		Description: category.Description,

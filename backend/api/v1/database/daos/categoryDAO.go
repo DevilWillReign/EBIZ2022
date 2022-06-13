@@ -7,17 +7,17 @@ import (
 )
 
 func GetCategories(db *gorm.DB) ([]dtos.CategoryDTO, error) {
-	var categories []dtos.CategoryDTO
+	categories := []dtos.CategoryDTO{}
 	return GetEntities(db, &categories)
 }
 
 func GetCategoryById(db *gorm.DB, id uint64) (dtos.CategoryDTO, error) {
-	var categoryDTO dtos.CategoryDTO
+	categoryDTO := dtos.CategoryDTO{}
 	return GetEntityById(db, id, &categoryDTO)
 }
 
 func DeleteCategoryById(db *gorm.DB, id uint64) error {
-	var categoryDTO dtos.CategoryDTO
+	categoryDTO := dtos.CategoryDTO{}
 	return DeleteEntityById(db, id, &categoryDTO)
 }
 

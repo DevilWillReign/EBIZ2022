@@ -15,7 +15,7 @@ func GetProducts(db *gorm.DB) ([]models.Product, error) {
 	if err != nil {
 		return []models.Product{}, echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
-	var products []models.Product
+	products := []models.Product{}
 	for _, productDTO := range productDTOs {
 		products = append(products, copyProductProperties(productDTO))
 	}
@@ -59,7 +59,7 @@ func GetProductsByCategoryId(db *gorm.DB, id uint64) ([]models.Product, error) {
 	if err != nil {
 		return []models.Product{}, echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
-	var products []models.Product
+	products := []models.Product{}
 	for _, productDTO := range productDTOs {
 		products = append(products, copyProductProperties(productDTO))
 	}

@@ -7,17 +7,17 @@ import (
 )
 
 func GetAuths(db *gorm.DB) ([]dtos.AuthDTO, error) {
-	var auths []dtos.AuthDTO
+	auths := []dtos.AuthDTO{}
 	return GetEntities(db, &auths)
 }
 
 func GetAuthById(db *gorm.DB, id uint64) (dtos.AuthDTO, error) {
-	var authDTO dtos.AuthDTO
+	authDTO := dtos.AuthDTO{}
 	return GetEntityById(db, id, &authDTO)
 }
 
 func DeleteAuthById(db *gorm.DB, id uint64) error {
-	var authDTO dtos.AuthDTO
+	authDTO := dtos.AuthDTO{}
 	return DeleteEntityById(db, id, &authDTO)
 }
 

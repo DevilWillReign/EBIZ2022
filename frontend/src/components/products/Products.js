@@ -6,9 +6,9 @@ const Products = () => {
     const [products, setProducts] = useState([])
 
     useEffect(() => {
-        API().get("/products").then((response) => {
+        API.get("/products").then((response) => {
             if (response.status === 200) {
-                setProducts(response.data)
+                setProducts([...response.data.elements])
             }
         }).catch((reason) => {
             console.log(reason)

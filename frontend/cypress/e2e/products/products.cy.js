@@ -2,12 +2,12 @@
 
 describe("products component test", () => {
     beforeEach(() => {
-        cy.intercept(Cypress.env("api_url") + "/products", [
+        cy.intercept(Cypress.env("api_url") + "/products", {elements: [
             {id: 1, name: "Name1", code: "Code1"},
             {id: 2, name: "Name2", code: "Code2"},
             {id: 3, name: "Name3", code: "Code3"},
             {id: 4, name: "Name4", code: "Code4"}
-        ])
+        ]})
         cy.visit(Cypress.env("front_url") + "/products")
     })
 

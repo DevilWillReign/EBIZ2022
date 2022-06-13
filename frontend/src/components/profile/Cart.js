@@ -1,11 +1,20 @@
 import { useState } from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { API_PROTECTED } from "../../util/api"
 
 const Cart = () => {
+    const [loggedIn, ] = useState(localStorage.getItem("userinfo") !== null)
     const [cart, setCart] = useState(localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [])
+    const navigate = useNavigate()
 
     const buyForProducts = () => {
-        console.log("Paying")
+        API_PROTECTED.post("/user/transactions", {quantifiedproducts: cart})
+        .then(response => {
+            if (response.status === 201) {
+                localStorage.removeItem("cart")
+                navigate("/profile/payments/form/" + response.data.transactionid)
+            }
+        }).catch(() => {})
     }
     
     const removeProduct = (product) => {
@@ -40,7 +49,9 @@ const Cart = () => {
                                 })
                             }
                         </ol>
-                        <button id="cart-pay" className="btn btn-primary" onClick={() => buyForProducts()}>Pay</button>
+                            {   loggedIn ? <button id="cart-pay" className="btn btn-primary" onClick={() => buyForProducts()}>Go to payment</button>
+                                : <span>Login to buy products</span>
+                            }
                     </>
                 ) 
             }

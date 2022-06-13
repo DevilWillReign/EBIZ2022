@@ -7,7 +7,7 @@ const Logout = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            API_PROTECTED().get("/auths/logout").then(() => {
+            API_PROTECTED.get("/auths/logout").then(() => {
                 localStorage.removeItem("userinfo")
                 navigate("/", { replace: true })
             }).catch(reason => {

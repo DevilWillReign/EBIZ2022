@@ -9,7 +9,7 @@ const Product = () => {
     const { productId } = useParams()
 
     useEffect(() => {
-        API().get("/products/" + productId).then((response) => {
+        API.get("/products/" + productId).then((response) => {
             if (response.status === 200) {
                 setProduct(response.data)
             }

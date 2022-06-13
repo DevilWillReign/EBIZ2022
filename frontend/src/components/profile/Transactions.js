@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { API_PROTECTED } from "../../util/api"
 
 const Transactions = () => {
-    const [loggedIn] = useState(localStorage.getItem("userinfo") !== null)
+    const [loggedIn, ] = useState(localStorage.getItem("userinfo") !== null)
     const [transactions, setTransactions] = useState([])
     const navigate = useNavigate()
 
@@ -12,8 +12,10 @@ const Transactions = () => {
             localStorage.setItem("userinfo", null)
             navigate("/auth/logout", { replace: true })
         }
-        API_PROTECTED().get("/user/transactions").then(response => {
-            setTransactions([...response.data])
+        API_PROTECTED.get("/user/transactions").then(response => {
+            if (response.status === 200) {
+                setTransactions([...response.data.elements])
+            }
         }).catch(() => {
             navigate("/auth/logout", { replace: true })
         })
@@ -25,8 +27,8 @@ const Transactions = () => {
                 {
                     transactions.map(transaction => {
                         return (
-                            <li className="list-group-item">
-                                <NavLink to={"" + transaction.id}>{transaction.id + " " + transaction.createdat}</NavLink>
+                            <li key={transaction.id} className="list-group-item">
+                                <NavLink to={"" + transaction.id}>Total: {transaction.total + ", Date: " + transaction.createdat}</NavLink>
                             </li>
                         )
                     })
