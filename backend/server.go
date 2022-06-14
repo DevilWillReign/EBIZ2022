@@ -60,5 +60,5 @@ func main() {
 	controllers.GetTransactionGroup(api)
 	controllers.GetUsersGroup(api)
 	controllers.GetUserGroup(api)
-	e.Logger.Fatal(e.Start(utils.GetEnv("API_HOST", "") + ":" + utils.GetEnv("API_PORT", "9000")))
+	e.Logger.Fatal(e.StartAutoTLS(utils.GetEnv("API_HOST", "") + ":" + utils.GetEnv("API_PORT", "9000")))
 }
