@@ -26,9 +26,10 @@ services:
     ports:
       - "9000:9000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      - PROFILE=DEV
+      - PROFILE=PROD
       - PORT=9000
       - DATABASE_ADDRESS=database
     env_file:
@@ -47,6 +48,12 @@ services:
     volumes:
       - my-datavolume:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     networks:
       main:
         aliases:

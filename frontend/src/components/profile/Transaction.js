@@ -34,7 +34,7 @@ const Transaction = () => {
                 <ul id="transaction-info" className="list-group">
                     <li id="transaction-date" className="list-group-item">Date: {transaction.createdat}</li>
                     <li id="transaction-total" className="list-group-item">Total: {transaction.total}</li>
-                    <li id="transaction-payment" className="list-group-item">Payment: {transaction.payment || transaction.payment.id !== 0 ? "Paid" : "Not paid"}</li>
+                    <li id="transaction-payment" className="list-group-item">Payment: {"payment" in transaction && "id" in transaction.payment && transaction.payment.id !== 0 ? "Paid" : "Not paid"}</li>
                     <li id="transaction-products-label" className="list-group-item">Products:</li>
                     <TransactionProducts products={transaction.quantifiedproducts} />
                 </ul>
