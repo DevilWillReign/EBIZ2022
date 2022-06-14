@@ -8,7 +8,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -146,7 +145,6 @@ func authWithOAuthCallback(c echo.Context) error {
 	}
 	data, err := getUserDataFromProvider(c.FormValue("code"), oauthConfig, c.Param("provider"))
 
-	log.Println(err)
 	if err != nil {
 		sess.Values["redirect"] = nil
 		sess.Save(c.Request(), c.Response())

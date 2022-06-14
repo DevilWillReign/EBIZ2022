@@ -39,11 +39,6 @@ func main() {
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 		AllowCredentials: true,
 	}))
-	log.Println(middleware.CORSConfig{
-		AllowOrigins:     strings.Split(utils.GetEnv("FRONT_HOST", "http://localhost:9001"), ","),
-		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-		AllowCredentials: true,
-	})
 	// Session
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte(utils.GetEnv("SESSION_SECRET", "secret")))))
 	// Adding validator
