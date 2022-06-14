@@ -29,7 +29,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      - PROFILE=PROD
+      - PROFILE=DEV
       - PORT=9000
       - DATABASE_ADDRESS=database
     env_file:

@@ -71,7 +71,7 @@ func RandStringBytes(n int) string {
 }
 
 func GetTokenCookie(token string) *http.Cookie {
-	return &http.Cookie{Name: "userinfo", Value: token, HttpOnly: true, SameSite: http.SameSiteStrictMode, Path: "/"}
+	return &http.Cookie{Name: "userinfo", Value: token, HttpOnly: true, SameSite: http.SameSiteNoneMode, Path: "/"}
 }
 
 func HashPassword(password []byte, salt []byte) []byte {

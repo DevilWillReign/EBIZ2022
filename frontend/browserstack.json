@@ -14,7 +14,7 @@
         }
     ],
     "run_settings": {
-        "cypress_proj_dir": "./cypress.json",
+        "cypress_proj_dir": "./cypress.env.json",
         "project": "Apprit store",
         "customBuildName": "Apprit store multi broser test"
     },
