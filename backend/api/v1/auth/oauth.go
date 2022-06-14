@@ -28,9 +28,9 @@ const oauthGithubUrlAPI = "https://api.github.com/user"
 
 const oauthGithubEmailUrlAPI = "https://api.github.com/user/emails"
 
-const oauthGitlabUrlAPI = "https://gitlab.example.com/api/v4/user"
+const oauthGitlabUrlAPI = "https://gitlab.com/api/v4/user"
 
-const oauthGitlabEmailUrlAPI = "https://gitlab.example.com/api/v4/user/emails"
+const oauthGitlabEmailUrlAPI = "https://gitlab.com/api/v4/user/emails"
 
 func createCallbackUrl(provider string) string {
 	port := utils.GetEnv("API_PORT", "9000")
@@ -94,7 +94,7 @@ func getUserDataClient(provider string, token *oauth2.Token) (*http.Request, *ht
 	return nil, nil
 }
 
-func GetUserData(provider string, token *oauth2.Token) (*models.UserData, error) {
+func GetUserData(provider string, token *oauth2.Token) (*models.CallbackUserData, error) {
 	req, reqEmail := getUserDataClient(provider, token)
 	httpClient := &http.Client{}
 	response, err := httpClient.Do(req)
@@ -106,7 +106,7 @@ func GetUserData(provider string, token *oauth2.Token) (*models.UserData, error)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	userData := new(models.UserData)
+	userData := new(models.CallbackUserData)
 	if err := json.Unmarshal(contents, userData); err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

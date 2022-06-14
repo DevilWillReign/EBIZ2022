@@ -21,11 +21,11 @@ func CreateDatabase() *gorm.DB {
 	var err error
 	if profile == "DEV" {
 		databaseUser := utils.GetEnv("DATABASE_USER", "")
-		databasePassword := utils.GetEnv("DATABASE_PASS", "")
+		databasePassword := utils.GetEnv("DATABASE_PASSWORD", "")
 		databaseAddress := utils.GetEnv("DATABASE_ADDRESS", "")
 		databasePort := utils.GetEnv("DATABASE_PORT", "")
 		dsn := ""
-		if databasePassword == "" {
+		if databasePassword != "" {
 			dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", databaseUser, databasePassword, databaseAddress, databasePort, databaseName)
 		} else {
 			dsn = fmt.Sprintf("%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", databaseUser, databaseAddress, databasePort, databaseName)

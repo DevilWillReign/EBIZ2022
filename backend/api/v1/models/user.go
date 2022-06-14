@@ -15,6 +15,11 @@ type UserData struct {
 	Admin bool   `json:"admin"`
 }
 
+type CallbackUserData struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type UserLogin struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`

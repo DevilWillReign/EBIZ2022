@@ -8,6 +8,7 @@
 *.so
 *.dylib
 *.env
+init.sql
 
 .idea/
 .bsp/

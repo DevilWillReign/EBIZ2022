@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -144,6 +145,8 @@ func authWithOAuthCallback(c echo.Context) error {
 		return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 	}
 	data, err := getUserDataFromProvider(c.FormValue("code"), oauthConfig, c.Param("provider"))
+
+	log.Println(err)
 	if err != nil {
 		sess.Values["redirect"] = nil
 		sess.Save(c.Request(), c.Response())
@@ -160,7 +163,7 @@ func authWithOAuthCallback(c echo.Context) error {
 	}
 	t, err := auth.CreateToken(models.ConverUserToUserData(user))
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return c.Redirect(http.StatusPermanentRedirect, err.Error())
 	}
 	c.SetCookie(utils.GetTokenCookie(t))
 	c.SetCookie(&http.Cookie{Name: "oauthstate", Value: "", Expires: time.Unix(0, 0)})
@@ -180,7 +183,7 @@ func generateStateOauthCookie(c echo.Context) string {
 	return state
 }
 
-func getUserDataFromProvider(code string, oauthConfig *oauth2.Config, provider string) (*models.UserData, error) {
+func getUserDataFromProvider(code string, oauthConfig *oauth2.Config, provider string) (*models.CallbackUserData, error) {
 	token, err := oauthConfig.Exchange(context.Background(), code)
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
