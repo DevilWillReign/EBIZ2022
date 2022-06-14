@@ -1,20 +1,39 @@
 version: "3.9"
 services:
   front:
-    image: 'apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritstore:${{ github.sha }}'
-    container_name: appritstore_front
+    build:
+      context: ./frontend
+      dockerfile: dev.Dockerfile
+    ports:
+      - "9001:9001"
     depends_on:
       - api
-    ports:
-      - "8080:8080"
     environment:
-      - REACT_APP_API_BASE_URL=http://backend:9000/api/v1
+      - PORT=9001
+      - REACT_APP_API_BASE_URL=http://backend/api/v1
     links:
       - "api:backend"
   api:
-    image: 'apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritback:${{ github.sha }}'
-    container_name: appritstore_back
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
     ports:
       - "9000:9000"
+    depends_on:
+      - db
     environment:
-      - API_PORT=9000
+      - PORT=9000
+      - DATABASE_ADDRESS=database
+    env_file:
+      - ./docker-compose-api.env
+    links:
+      - "db:database"
+  db:
+    image: mysql:latest
+    env_file:
+      - ./docker-compose-mysql.env
+    volumes:
+      - my-datavolume:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  my-datavolume:

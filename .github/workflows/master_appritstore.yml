@@ -87,10 +87,7 @@ jobs:
         app-name: 'appritstore'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_ef29c38d3ed44935a31269c2ad25437d }}
-        images: |
-          'apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritstore:${{ github.sha }}'
-          'apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritback:${{ github.sha }}'
-        configuration-file: ./docker-compose.yaml
+        images: 'apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritstore:${{ github.sha }}'
         
     - name: Deploy back to Azure Web App
       id: deploy-back-to-webapp
