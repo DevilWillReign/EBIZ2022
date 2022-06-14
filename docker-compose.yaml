@@ -4,16 +4,20 @@ services:
     build:
       context: ./frontend
       dockerfile: dev.Dockerfile
+    container_name: appritstore-front
     ports:
       - "9001:9001"
     depends_on:
       - api
     environment:
       - PORT=9001
-      - REACT_APP_API_BASE_URL=http://backend/api/v1
-    links:
-      - "api:backend"
+      - REACT_APP_API_BASE_URL=http://localhost:9000/api/v1
+    networks:
+      main:
+        aliases:
+          - front
   api:
+    container_name: appritstore-api
     build:
       context: ./backend
       dockerfile: dev.Dockerfile
@@ -23,17 +27,28 @@ services:
       - db
     environment:
       - PORT=9000
-      - DATABASE_ADDRESS=database
+      - DATABASE_ADDRESS=localhost
     env_file:
       - ./docker-compose-api.env
-    links:
-      - "db:database"
+    networks:
+      main:
+        aliases:
+          - backend
   db:
+    container_name: appritstore-db
     image: mysql:latest
+    ports:
+      - "3306:3306"
     env_file:
       - ./docker-compose-mysql.env
     volumes:
       - my-datavolume:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      main:
+        aliases:
+          - database
 volumes:
   my-datavolume:
+networks:
+  main:

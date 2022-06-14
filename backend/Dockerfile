@@ -40,4 +40,4 @@ RUN go build -o appritstoreback
 
 EXPOSE ${API_PORT}
 
-CMD [ "appritstoreback" ]
+CMD [ "./appritstoreback" ]

@@ -15,4 +15,4 @@ RUN go build -o appritstoreback
 
 EXPOSE 9000
 
-CMD [ "appritstoreback" ]
+CMD [ "./appritstoreback" ]
