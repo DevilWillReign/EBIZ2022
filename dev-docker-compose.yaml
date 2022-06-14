@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  front:
+    build:
+      context: ./frontend
+      dockerfile: dev.Dockerfile
+    ports:
+      - "9001:9001"
+    depends_on:
+      - api
+    environment:
+      - PORT=9001
+      - REACT_APP_API_BASE_URL=http://backend:9000/api/v1
+    links:
+      - "api:backend"
+  api:
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    environment:
+      - PORT=9000
+      - DATABASE_ADDRESS=database
+    env_file:
+      - ./docker-compose-api.env
+    links:
+      - "db:database"
+  db:
+    image: mysql:latest
+    env_file:
+      - ./docker-compose-mysql.env
+    volumes:
+      - my-datavolume:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  my-datavolume:
