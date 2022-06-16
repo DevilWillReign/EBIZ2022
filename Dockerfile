@@ -60,16 +60,13 @@ ARG ARG_FRONT_PORT=9001
 ENV PORT $ARG_FRONT_PORT
 ENV REACT_APP_API_BASE_URL $ARG_API_BASE_URL
 
-RUN useradd -m -s /bin/bash appuser
-WORKDIR /home/appuser
+WORKDIR /usr/src/app
 RUN mkdir web
 
 COPY --from=go_builder /home/appuser .
 COPY --from=node_builder /usr/src/app ./web
-COPY ./start.sh /home/appuser/start.sh
-RUN chmod +x /home/appuser/start.sh
-
-USER appuser
+COPY ./start.sh /usr/src/app/start.sh
+RUN chmod +x /usr/src/app/start.sh
 
 EXPOSE ${PORT}
 CMD ./start.sh
