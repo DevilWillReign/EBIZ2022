@@ -53,7 +53,11 @@ func authTokenLocal(c echo.Context) error {
 }
 
 func authLogout(c echo.Context) error {
-	c.SetCookie(&http.Cookie{Name: "userinfo", Value: "", HttpOnly: true, SameSite: http.SameSiteStrictMode, Expires: time.Unix(0, 0), Path: "/"})
+	profile := utils.GetEnv("PROFILE", "DEV")
+	if profile != "DEV" {
+		c.SetCookie(&http.Cookie{Name: "userinfo", Value: "", HttpOnly: true, SameSite: http.SameSiteNoneMode, Path: "/", Secure: true, Domain: c.Request().Referer(), Expires: time.Unix(0, 0)})
+	}
+	c.SetCookie(&http.Cookie{Name: "userinfo", Value: "", HttpOnly: true, SameSite: http.SameSiteStrictMode, Path: "/", Expires: time.Unix(0, 0)})
 	return c.NoContent(http.StatusOK)
 }
 
