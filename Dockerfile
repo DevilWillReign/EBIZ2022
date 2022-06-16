@@ -1,5 +1,34 @@
 FROM golang:1.18-buster as go_builder
 
+RUN useradd -m -s /bin/bash appuser
+USER appuser
+WORKDIR /home/appuser
+
+COPY ./backend/go.mod ./
+COPY ./backend/go.sum ./
+
+RUN go mod download
+
+COPY ./backend/* ./
+
+RUN go build -o appritstoreback
+
+# Build the React application
+FROM node:16 as node_builder
+
+WORKDIR /usr/src/app
+
+# install and cache app dependencies
+COPY ./frontend/package*.json ./
+ADD ./frontend/package.json /usr/src/app/package.json
+RUN npm install
+
+# Bundle app source
+COPY ./frontend/* .
+
+# Final stage build, this will be the container with Go and React
+FROM node:16
+
 ARG ARG_FRONT_HOST=http://localhost:9001
 ARG ARG_API_PORT=9000
 ARG ARG_API_HOST_CALLBACK
@@ -25,43 +54,11 @@ ENV GL_OAUTH_CLIENT_ID $ARG_GL_OAUTH_CLIENT_ID
 ENV GL_OAUTH_CLIENT_SECRET $ARG_GL_OAUTH_CLIENT_SECRET
 ENV PROFILE=PROD
 
-RUN useradd -m -s /bin/bash appuser
-USER appuser
-WORKDIR /home/appuser
-
-COPY ./backend/go.mod ./
-COPY ./backend/go.sum ./
-
-RUN go mod download
-
-COPY ./backend/* .
-
-RUN go build -o appritstoreback
-
-EXPOSE ${API_PORT}
-
-# Build the React application
-FROM node:16 as node_builder
-
 ARG ARG_API_BASE_URL=http://localhost:9000/api/v1
 ARG ARG_FRONT_PORT=9001
 
 ENV PORT $ARG_FRONT_PORT
 ENV REACT_APP_API_BASE_URL $ARG_API_BASE_URL
-
-WORKDIR /usr/src/app
-
-# install and cache app dependencies
-COPY ./frontend/package*.json ./
-ADD ./frontend/package.json /usr/src/app/package.json
-RUN npm install
-
-# Bundle app source
-COPY ./frontend/* .
-
-
-# Final stage build, this will be the container with Go and React
-FROM node:16
 
 RUN useradd -m -s /bin/bash appuser
 USER appuser
