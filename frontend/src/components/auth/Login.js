@@ -80,9 +80,9 @@ const Login = () => {
                 </Formik>
                 <hr />
                 <div>
-                    <form className="mb-1" action={api_url + "/auths/google/login"}><input type="hidden" value={location} name="redirect_url"/><input type="submit" className="btn btn-lg btn-secondary w-100" value="Google Login" /></form>
-                    <form className="mb-1" action={api_url + "/auths/github/login"}><input type="hidden" value={location} name="redirect_url"/><input type="submit" className="btn btn-lg btn-secondary w-100" value="Github Login" /></form>
-                    <form action={api_url + "/auths/gitlab/login"}><input type="hidden" value={location} name="redirect_url"/><input type="submit" className="btn btn-lg btn-secondary w-100" value="Gitlab Login" /></form>
+                    <a className="btn btn-lg btn-secondary w-100 mb-1" href={api_url + "/auths/google/login?redirect_url=" + location}>Google Login</a>
+                    <a className="btn btn-lg btn-secondary w-100 mb-1" href={api_url + "/auths/github/login?redirect_url=" + location}>Github Login</a>
+                    <a className="btn btn-lg btn-secondary w-100" href={api_url + "/auths/gitlab/login?redirect_url=" + location}>Gitlab Login</a>
                 </div>
             </div>
         </div>

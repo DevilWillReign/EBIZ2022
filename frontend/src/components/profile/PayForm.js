@@ -6,7 +6,7 @@ import { API_PROTECTED } from "../../util/api"
 
 const PayForm = () => {
     const navigate = useNavigate()
-    const [loggedIn, _setLoggedIn] = useState(localStorage.getItem("userinfo") !== null)
+    const [loggedIn, ] = useState(localStorage.getItem("userinfo") !== null)
     const [failed, setFailed] = useState(false)
     const { transactionId } = useParams()
     const [total, setTotal] = useState(0)
