@@ -70,10 +70,10 @@ func RandStringBytes(n int) string {
 	return string(b)
 }
 
-func GetTokenCookie(token string, domain string) *http.Cookie {
+func GetTokenCookie(token string) *http.Cookie {
 	profile := GetEnv("PROFILE", "DEV")
 	if profile != "DEV" {
-		return &http.Cookie{Name: "userinfo", Value: token, HttpOnly: true, SameSite: http.SameSiteNoneMode, Path: "/", Secure: true, Domain: domain}
+		return &http.Cookie{Name: "userinfo", Value: token, HttpOnly: true, SameSite: http.SameSiteNoneMode, Path: "/", Secure: true}
 	}
 	return &http.Cookie{Name: "userinfo", Value: token, HttpOnly: true, SameSite: http.SameSiteStrictMode, Path: "/"}
 }
