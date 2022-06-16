@@ -32,7 +32,7 @@ const Register = () => {
                                 setSubmitting(false);
                                 navigate("/", { replace: true })
                             }
-                        }).catch(reason => {
+                        }).catch(() => {
                             setSubmitting(false);
                             setFailed(true);
                             removeCookies();

@@ -14,7 +14,7 @@ const Cart = () => {
                 localStorage.removeItem("cart")
                 navigate("/profile/payments/form/" + response.data.transactionid)
             }
-        }).catch(() => {})
+        }).catch(() => {console.log("TRANSACTION ERROR")})
     }
     
     const removeProduct = (product) => {
@@ -25,6 +25,11 @@ const Cart = () => {
             localStorage.setItem("cart", JSON.stringify(currentCart))
         }
         setCart([...currentCart])
+    }
+
+    const button = (loggedIn) => {
+        return loggedIn ? <button id="cart-pay" className="btn btn-primary" onClick={() => buyForProducts()}>Go to payment</button>
+        : <span>Login to buy products</span>
     }
 
     return (
@@ -49,9 +54,7 @@ const Cart = () => {
                                 })
                             }
                         </ol>
-                            {   loggedIn ? <button id="cart-pay" className="btn btn-primary" onClick={() => buyForProducts()}>Go to payment</button>
-                                : <span>Login to buy products</span>
-                            }
+                            { button(loggedIn) }
                     </>
                 ) 
             }

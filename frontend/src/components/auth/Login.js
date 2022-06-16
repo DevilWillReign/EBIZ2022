@@ -42,7 +42,7 @@ const Login = () => {
                                 setSubmitting(false);
                                 navigate("/", { replace: true })
                             }
-                        }).catch(reason => {
+                        }).catch(() => {
                             setSubmitting(false);
                             setFailed(true);
                             removeCookies();

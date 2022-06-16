@@ -19,7 +19,7 @@ const PayForm = () => {
         API_PROTECTED.get("/user/transactions/" + transactionId + "/total").then(response => {
             console.log(response)
             setTotal(response.data.total)
-        }).catch(() => {})
+        }).catch(() => {console.log("PAYMENT ERROR")})
     }, [loggedIn, navigate])
 
     return (
@@ -31,6 +31,7 @@ const PayForm = () => {
                         cardnumber: Yup.string().required("Required"),
                     })}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
+                        console.log(values)
                         setSubmitting(true);
                         API_PROTECTED.post("/user/payments", {paymenttype: 1, transactionid: Number(transactionId)}).then((response) => {
                             if (response.status === 201) {

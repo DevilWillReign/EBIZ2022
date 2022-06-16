@@ -20,7 +20,7 @@ const Product = () => {
     
 
     const findProductInArray = (array, productToFind) => {
-        for (var i = 0; i < array.length; i++) {
+        for (let i = 0; i < array.length; i++) {
             if (array[i].code === productToFind.code) {
                 return i
             }

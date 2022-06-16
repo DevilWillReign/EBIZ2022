@@ -8,7 +8,7 @@ const CategoryDropdown = (props) => {
     useEffect(() => {
         API.get("/categories").then(response => {
             setCategories([...response.data.elements])
-        }).catch(() => {})
+        }).catch(() => {console.log("CATEGORIES ERROR")})
     }, [])
 
     return (

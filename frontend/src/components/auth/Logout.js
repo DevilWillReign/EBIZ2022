@@ -10,7 +10,7 @@ const Logout = () => {
             API_PROTECTED.get("/auths/logout").then(() => {
                 localStorage.removeItem("userinfo")
                 navigate("/", { replace: true })
-            }).catch(reason => {
+            }).catch(() => {
                 localStorage.removeItem("userinfo")
                 navigate("/", { replace: true })
             })
