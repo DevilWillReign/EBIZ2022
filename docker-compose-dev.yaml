@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  api:
+    image: appritstore
+    container_name: appritstore
+    build:
+      dockerfile: dev.Dockerfile
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - PORT=9001
+      - REACT_APP_API_BASE_URL=http://localhost:9000/api/v1
+      - PROFILE=PROD
+      - API_PORT=9000
+      - DATABASE_ADDRESS=database
+    env_file:
+      - ./docker-compose-api.env
+    networks:
+      main:
+        aliases:
+          - backend
+  db:
+    container_name: appritstore-db
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./docker-compose-mysql.env
+    volumes:
+      - my-datavolume:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      main:
+        aliases:
+          - database
+volumes:
+  my-datavolume:
+networks:
+  main:

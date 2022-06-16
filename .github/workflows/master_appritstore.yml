@@ -41,13 +41,21 @@ jobs:
         username: ${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}
         password: ${{ secrets.AzureAppService_ContainerPassword_e61f7ed2991c4229b242cde6ff3c9c7c }}
 
-        
-    - name: Build and push container back image to registry
+    - name: Build and push container front image to registry
       uses: docker/build-push-action@v2
       with:
         build-args: |
           ARG_FRONT_PORT=${{ env.FRONT_PORT }}
           ARG_API_BASE_URL=${{ env.API_BASE_URL }}
+        context: ./frontend
+        push: true
+        tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritstore:${{ github.sha }}
+        file: ./frontend/Dockerfile
+        
+    - name: Build and push container back image to registry
+      uses: docker/build-push-action@v2
+      with:
+        build-args: |
           ARG_API_PORT=${{ env.API_PORT }}
           ARG_API_HOST_CALLBACK=${{ env.API_HOST_CALLBACK }}
           ARG_FRONT_HOST=${{ env.FRONT_HOST }}
@@ -59,9 +67,10 @@ jobs:
           ARG_GH_OAUTH_CLIENT_SECRET=${{ env.GH_OAUTH_CLIENT_SECRET }}
           ARG_GL_OAUTH_CLIENT_ID=${{ env.GL_OAUTH_CLIENT_ID }}
           ARG_GL_OAUTH_CLIENT_SECRET=${{ env.GL_OAUTH_CLIENT_SECRET }}
+        context: ./backend
         push: true
         tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritback:${{ github.sha }}
-        file: ./Dockerfile
+        file: ./backend/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
