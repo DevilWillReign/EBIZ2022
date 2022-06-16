@@ -9,7 +9,7 @@ COPY ./backend/go.sum ./
 
 RUN go mod download
 
-COPY ./backend/* ./
+ADD ./backend ./
 
 RUN go build -o appritstoreback
 
@@ -24,7 +24,7 @@ ADD ./frontend/package.json /usr/src/app/package.json
 RUN npm install
 
 # Bundle app source
-COPY ./frontend/* .
+ADD ./frontend ./
 
 # Final stage build, this will be the container with Go and React
 FROM node:16
@@ -61,7 +61,6 @@ ENV PORT $ARG_FRONT_PORT
 ENV REACT_APP_API_BASE_URL $ARG_API_BASE_URL
 
 RUN useradd -m -s /bin/bash appuser
-USER appuser
 WORKDIR /home/appuser
 RUN mkdir web
 
@@ -69,6 +68,8 @@ COPY --from=go_builder /home/appuser .
 COPY --from=node_builder /usr/src/app ./web
 COPY ./start.sh /home/appuser/start.sh
 RUN chmod +x /home/appuser/start.sh
+
+USER appuser
 
 EXPOSE ${PORT}
 CMD ./start.sh
