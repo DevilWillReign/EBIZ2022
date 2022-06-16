@@ -33,6 +33,11 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	profile := utils.GetEnv("PROFILE", "DEV")
+	if profile != "DEV" {
+		e.Pre(middleware.HTTPSRedirect())
+	}
+
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     strings.Split(utils.GetEnv("FRONT_HOST", "http://localhost:9001"), ","),
