@@ -60,45 +60,45 @@ func authLogout(c echo.Context) error {
 func authLogin(c echo.Context) error {
 	user := new(models.UserLogin)
 	if err := utils.BindAndValidateObject(c, user); err != nil {
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Domain: c.Request().Referer()})
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	userData, err := services.LoginWithUser(c.Get("db").(*gorm.DB), *user)
 	if err != nil {
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Domain: c.Request().Referer()})
 		return err
 	}
 
 	t, err := auth.CreateToken(userData)
 	if err != nil {
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Domain: c.Request().Referer()})
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	c.SetCookie(utils.GetTokenCookie(t))
-	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success"})
+	c.SetCookie(utils.GetTokenCookie(t, c.Request().Referer()))
+	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success", Domain: c.Request().Referer()})
 	return c.NoContent(http.StatusOK)
 }
 
 func authRegister(c echo.Context) error {
 	user := new(models.User)
 	if err := utils.BindAndValidateObject(c, user); err != nil {
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Domain: c.Request().Referer()})
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	user.Admin = false
 	userData, err := services.AddUser(c.Get("db").(*gorm.DB), *user)
 	if err != nil {
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Domain: c.Request().Referer()})
 		return err
 	}
 
 	t, err := auth.CreateToken(models.ConverUserToUserData(userData))
 	if err != nil {
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure"})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Domain: c.Request().Referer()})
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	c.SetCookie(utils.GetTokenCookie(t))
-	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success"})
+	c.SetCookie(utils.GetTokenCookie(t, c.Request().Referer()))
+	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success", Domain: c.Request().Referer()})
 	return c.NoContent(http.StatusCreated)
 }
 
@@ -140,7 +140,7 @@ func authWithOAuthCallback(c echo.Context) error {
 		sess.Values["redirect"] = nil
 		sess.Save(c.Request(), c.Response())
 		c.SetCookie(&http.Cookie{Name: "oauthstate", Value: "", Expires: time.Unix(0, 0)})
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Path: redirectUrl.Path})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Path: redirectUrl.Path, Domain: c.Request().Referer()})
 		return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 	}
 	data, err := getUserDataFromProvider(c.FormValue("code"), oauthConfig, c.Param("provider"))
@@ -149,7 +149,7 @@ func authWithOAuthCallback(c echo.Context) error {
 		sess.Values["redirect"] = nil
 		sess.Save(c.Request(), c.Response())
 		c.SetCookie(&http.Cookie{Name: "oauthstate", Value: "", Expires: time.Unix(0, 0)})
-		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Path: redirectUrl.Path})
+		c.SetCookie(&http.Cookie{Name: "login_state", Value: "failure", Path: redirectUrl.Path, Domain: c.Request().Referer()})
 		return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 	}
 	sess.Values["redirect"] = nil
@@ -163,9 +163,9 @@ func authWithOAuthCallback(c echo.Context) error {
 	if err != nil {
 		return c.Redirect(http.StatusPermanentRedirect, err.Error())
 	}
-	c.SetCookie(utils.GetTokenCookie(t))
+	c.SetCookie(utils.GetTokenCookie(t, c.Request().Referer()))
 	c.SetCookie(&http.Cookie{Name: "oauthstate", Value: "", Expires: time.Unix(0, 0)})
-	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success", Path: redirectUrl.Path})
+	c.SetCookie(&http.Cookie{Name: "login_state", Value: "success", Path: redirectUrl.Path, Domain: c.Request().Referer()})
 	return c.Redirect(http.StatusPermanentRedirect, redirect.(string))
 }
 
