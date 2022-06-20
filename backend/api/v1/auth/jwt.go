@@ -60,3 +60,12 @@ func IsNotAdminAndSameUser(c echo.Context, id uint64) bool {
 	claims := userToken.Claims.(*JwtCustomClaims)
 	return !claims.Admin && claims.ID != uint(id)
 }
+
+func GetUserIdOrError(c echo.Context) (uint64, error) {
+	user := c.Get("user").(*jwt.Token)
+	if user == nil {
+		return 0, echo.ErrUnauthorized
+	}
+	claims := user.Claims.(*JwtCustomClaims)
+	return uint64(claims.ID), nil
+}

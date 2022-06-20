@@ -118,11 +118,11 @@ func authWithOAuth(c echo.Context) error {
 	oauthState := generateStateOauthCookie(c)
 	var referer string
 	if utils.GetEnv("PROFILE", "DEV") == "PROXY" {
+		referer = c.QueryParam("redirect_url")
+	} else {
 		refererUrl, _ := url.Parse(c.Request().Referer())
 		refererUrl.Path = path.Join(refererUrl.Path, c.QueryParam("redirect_url"))
 		referer = refererUrl.String()
-	} else {
-		referer = c.QueryParam("redirect_url")
 	}
 	sess := utils.GetSession(c)
 	sess.Values["redirect"] = referer

@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/shopspring/decimal"
@@ -40,12 +39,11 @@ func GetUserGroup(e *echo.Group) {
 }
 
 func getUserData(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
-	userData, err := services.GetUserById(c.Get("db").(*gorm.DB), uint64(claims.ID))
+	userData, err := services.GetUserById(c.Get("db").(*gorm.DB), userId)
 	if err != nil {
 		return echo.ErrNotFound
 	}
@@ -53,12 +51,11 @@ func getUserData(c echo.Context) error {
 }
 
 func getUserTransactions(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
-	transactions, err := services.GetUserTransactions(c.Get("db").(*gorm.DB), uint64(claims.ID))
+	transactions, err := services.GetUserTransactions(c.Get("db").(*gorm.DB), userId)
 	if err != nil {
 		return echo.ErrNotFound
 	}
@@ -70,13 +67,12 @@ func getUserTransactionById(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
 	db := c.Get("db").(*gorm.DB)
-	transaction, err := services.GetUserTransactionById(db, uint64(claims.ID), id)
+	transaction, err := services.GetUserTransactionById(db, userId, id)
 	if err != nil {
 		return echo.ErrNotFound
 	}
@@ -98,13 +94,12 @@ func getUserTransactionTotalById(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
 	db := c.Get("db").(*gorm.DB)
-	transaction, err := services.GetUserTransactionById(db, uint64(claims.ID), id)
+	transaction, err := services.GetUserTransactionById(db, userId, id)
 	if err != nil {
 		return echo.ErrNotFound
 	}
@@ -120,12 +115,11 @@ func getUserPaymentsById(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
-	payment, err := services.GetUserPaymentById(c.Get("db").(*gorm.DB), uint64(claims.ID), transactionid, id)
+	payment, err := services.GetUserPaymentById(c.Get("db").(*gorm.DB), userId, transactionid, id)
 	if err != nil {
 		return echo.ErrNotFound
 	}
@@ -133,16 +127,15 @@ func getUserPaymentsById(c echo.Context) error {
 }
 
 func addUserTransaction(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
 	transaction := models.UserTransaction{}
 	if err := c.Bind(&transaction); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	transaction.UserID = claims.ID
+	transaction.UserID = uint(userId)
 	total := decimal.NewFromInt(0)
 	for _, product := range transaction.QuantifiedProducts {
 		total = total.Add(product.Price.Mul(decimal.NewFromInt(int64(product.Quantity))))
@@ -162,17 +155,16 @@ func addUserTransaction(c echo.Context) error {
 }
 
 func addUserPayments(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
 	payment := models.Payment{}
 	if err := utils.BindAndValidateObject(c, &payment); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	db := c.Get("db").(*gorm.DB)
-	if _, err := services.GetUserTransactionById(db, uint64(claims.ID), uint64(payment.TransactionID)); err != nil {
+	if _, err := services.GetUserTransactionById(db, userId, uint64(payment.TransactionID)); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	if _, err := services.AddPayment(db, payment); err != nil {
@@ -182,12 +174,11 @@ func addUserPayments(c echo.Context) error {
 }
 
 func getUserPayments(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	if user == nil {
-		return echo.ErrUnauthorized
+	userId, err := auth.GetUserIdOrError(c)
+	if err != nil {
+		return err
 	}
-	claims := user.Claims.(*auth.JwtCustomClaims)
-	transactions, err := services.GetUserTransactions(c.Get("db").(*gorm.DB), uint64(claims.ID))
+	transactions, err := services.GetUserTransactions(c.Get("db").(*gorm.DB), userId)
 	if err != nil {
 		return echo.ErrNotFound
 	}

@@ -9,7 +9,7 @@ services:
     image: apprit.azurecr.io/apprit/appritproxyback:latest
     container_name: appritstore-api
     environment:
-      - FRONT_HOST=http://WEBAPP_DOMAIN
+      - FRONT_HOST=http://${WEBAPP_DOMAIN}
       - API_HOST_CALLBACK=${WEBAPP_DOMAIN}
       - PROFILE=PROXY
       - API_PORT=9000
