@@ -33,6 +33,10 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	if utils.GetEnv("PROFILE", "DEV") == "PROXY" {
+		e.Pre(middleware.HTTPSRedirect())
+	}
+
 	// CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     strings.Split(utils.GetEnv("FRONT_HOST", "http://localhost:9001"), ","),
