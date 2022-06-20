@@ -116,10 +116,16 @@ func authWithOAuth(c echo.Context) error {
 		return c.Redirect(http.StatusPermanentRedirect, c.Request().Referer())
 	}
 	oauthState := generateStateOauthCookie(c)
-	referer, _ := url.Parse(c.Request().Referer())
-	referer.Path = path.Join(referer.Path, c.QueryParam("redirect_url"))
+	var referer string
+	if utils.GetEnv("PROFILE", "DEV") == "PROXY" {
+		refererUrl, _ := url.Parse(c.Request().Referer())
+		refererUrl.Path = path.Join(refererUrl.Path, c.QueryParam("redirect_url"))
+		referer = refererUrl.String()
+	} else {
+		referer = c.QueryParam("redirect_url")
+	}
 	sess := utils.GetSession(c)
-	sess.Values["redirect"] = referer.String()
+	sess.Values["redirect"] = referer
 	sess.Save(c.Request(), c.Response())
 	oauthConfigUrl := oauthConfig.AuthCodeURL(oauthState, oauth2.AccessTypeOffline)
 	return c.Redirect(http.StatusTemporaryRedirect, oauthConfigUrl)

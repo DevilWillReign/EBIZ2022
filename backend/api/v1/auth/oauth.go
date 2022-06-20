@@ -33,11 +33,7 @@ const oauthGitlabUrlAPI = "https://gitlab.com/api/v4/user"
 const oauthGitlabEmailUrlAPI = "https://gitlab.com/api/v4/user/emails"
 
 func createCallbackUrl(provider string) string {
-	port := utils.GetEnv("API_PORT", "9000")
-	if port == "80" || port == "8080" {
-		return "http://" + utils.GetEnv("API_HOST_CALLBACK", "localhost") + "/api/v1/auths/" + provider + "/callback"
-	}
-	return "http://" + utils.GetEnv("API_HOST_CALLBACK", "localhost") + ":" + port + "/api/v1/auths/" + provider + "/callback"
+	return "http://" + utils.GetEnv("API_HOST_CALLBACK", "localhost") + "/api/v1/auths/" + provider + "/callback"
 }
 
 func GetAuthConfig(provider string) *oauth2.Config {

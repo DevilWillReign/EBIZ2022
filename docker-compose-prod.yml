@@ -2,16 +2,18 @@ version: '3.9'
 
 services:
   front:
-    image: apprit.azurecr.io/apprit/appritstore:81e41985e45f2c802a60f7c8dd2f852792e9afeb
+    image: apprit.azurecr.io/apprit/appritstore:3c20b83bd013b962e6bd7137404dbd0b12d1426a
     ports:
-      - "8080:80"
+      - "8080:8080"
     restart: always
     environment:
       - PORT=8080
       - REACT_APP_API_BASE_URL=https://api:9000/api/v1
   api:
-    image: apprit.azurecr.io/apprit/appritback:81e41985e45f2c802a60f7c8dd2f852792e9afeb
+    image: apprit.azurecr.io/apprit/appritback:3c20b83bd013b962e6bd7137404dbd0b12d1426a
     restart: always
+    ports:
+      - "9000:9000"
     environment:
       - API_PORT=9000
-      - FRONT_HOST=https://apprit.azurewebsites.net
+      - FRONT_HOST=https://front

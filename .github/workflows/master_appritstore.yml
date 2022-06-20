@@ -11,10 +11,13 @@ on:
 
 env:
   API_PORT: ${{ secrets.API_PORT }}
+  API_PROXY_PORT: ${{ secrets.API_PROXY_PORT }}
   FRONT_PORT: 8080
   API_HOST_CALLBACK: ${{ secrets.API_HOST_CALLBACK }}
+  API_PROXY_HOST_CALLBACK: ${{ secrets.API_PROXY_HOST_CALLBACK }}
   FRONT_HOST: ${{ secrets.FRONT_HOST }}
   API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  API_PROXY_BASE_URL: ${{ secrets.API_PROXY_BASE_URL }}
   SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
   GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -51,12 +54,23 @@ jobs:
         push: true
         tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritstore:${{ github.sha }}
         file: ./frontend/Dockerfile
+
+    - name: Build and push container front with proxy image to registry
+      uses: docker/build-push-action@v2
+      with:
+        build-args: |
+          ARG_API_BASE_URL=${{ env.API_PROXY_BASE_URL }}
+          ARG_API_HOST_CALLBACK=${{ env.API_PROXY_HOST_CALLBACK }}
+        push: true
+        tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/apprit:latest
+        file: proxy.Dockerfile
         
     - name: Build and push container back image to registry
       uses: docker/build-push-action@v2
       with:
         build-args: |
-          ARG_API_PORT=${{ env.API_PORT }}
+          ARG_PROFILE=PROD
+          ARG_API_PORT=${{ env.API_PROXY_PORT }}
           ARG_API_HOST_CALLBACK=${{ env.API_HOST_CALLBACK }}
           ARG_FRONT_HOST=${{ env.FRONT_HOST }}
           ARG_SESSION_SECRET=${{ env.SESSION_SECRET }}
@@ -70,6 +84,27 @@ jobs:
         context: ./backend
         push: true
         tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritback:${{ github.sha }}
+        file: ./backend/Dockerfile
+        
+    - name: Build and push container back image to registry
+      uses: docker/build-push-action@v2
+      with:
+        build-args: |
+          ARG_PROFILE=PROXY
+          ARG_API_PORT=${{ env.API_PORT }}
+          ARG_API_HOST_CALLBACK=${{ env.API_PROXY_HOST_CALLBACK }}
+          ARG_FRONT_HOST=${{ env.PROXY_FRONT_HOST }}
+          ARG_SESSION_SECRET=${{ env.SESSION_SECRET }}
+          ARG_JWT_SECRET=${{ env.JWT_SECRET }}
+          ARG_GOOGLE_OAUTH_CLIENT_ID=${{ env.GOOGLE_OAUTH_CLIENT_ID }}
+          ARG_GOOGLE_OAUTH_CLIENT_SECRET=${{ env.GOOGLE_OAUTH_CLIENT_SECRET }}
+          ARG_GH_OAUTH_CLIENT_ID=${{ env.GH_OAUTH_CLIENT_ID }}
+          ARG_GH_OAUTH_CLIENT_SECRET=${{ env.GH_OAUTH_CLIENT_SECRET }}
+          ARG_GL_OAUTH_CLIENT_ID=${{ env.GL_OAUTH_CLIENT_ID }}
+          ARG_GL_OAUTH_CLIENT_SECRET=${{ env.GL_OAUTH_CLIENT_SECRET }}
+        context: ./backend
+        push: true
+        tags: apprit.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_f773627d499b43c694520aaae5cf917f }}/appritproxyback:latest
         file: ./backend/Dockerfile
 
   deploy:

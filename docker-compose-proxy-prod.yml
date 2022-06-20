@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  proxy:
+    image: apprit.azurecr.io/apprit/apprit:latest
+    container_name: appritstore-front
+    ports:
+      - "80:80"
+  api:
+    image: apprit.azurecr.io/apprit/appritproxyback:latest
+    container_name: appritstore-api
+    environment:
+      - FRONT_HOST=http://WEBAPP_DOMAIN
+      - API_HOST_CALLBACK=${WEBAPP_DOMAIN}
+      - PROFILE=PROXY
+      - API_PORT=9000

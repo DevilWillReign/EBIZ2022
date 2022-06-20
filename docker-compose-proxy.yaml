@@ -1,44 +1,29 @@
 version: "3.9"
 services:
-  front:
+  proxy:
     image: appritstore-front
-    build:
-      context: ./frontend
-      dockerfile: dev.Dockerfile
     container_name: appritstore-front
+    build:
+      dockerfile: proxy-dev.Dockerfile
     ports:
-      - "9001:9001"
-    depends_on:
-      - api
-    environment:
-      - PORT=9001
-      - REACT_APP_API_BASE_URL=http://localhost:9000/api/v1
-    networks:
-      main:
-        aliases:
-          - front
+      - "80:80"
   api:
     image: appritstore-back
     container_name: appritstore-api
     build:
       context: ./backend
       dockerfile: dev.Dockerfile
-    ports:
-      - "9000:9000"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - FRONT_HOST=http://localhost:9001
+      - FRONT_HOST=http://localhost
+      - API_HOST_CALLBACK=localhost
       - PROFILE=DEV
-      - PORT=9000
-      - DATABASE_ADDRESS=database
+      - API_PORT=9000
+      - DATABASE_ADDRESS=db
     env_file:
       - ./docker-compose-api.env
-    networks:
-      main:
-        aliases:
-          - backend
   db:
     container_name: appritstore-db
     image: mysql:latest
@@ -55,11 +40,5 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-    networks:
-      main:
-        aliases:
-          - database
 volumes:
   my-datavolume:
-networks:
-  main:
